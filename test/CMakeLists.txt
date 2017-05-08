@@ -6,8 +6,8 @@ set(IOScancoTests
 CreateTestDriver(IOScanco  "${IOScanco-Test_LIBRARIES}" "${IOScancoTests}")
 
 itk_add_test(NAME itkScancoImageIOTest
-      COMMAND IOScancoTestDriver
-    --compare DATA{${ITK_DATA_ROOT}/Baseline/IO/HeadMRVolume.mhd,HeadMRVolume.raw}
-              ${ITK_TEST_OUTPUT_DIR}/HeadMRVolume.mhd
-    itkScancoImageIOTest DATA{${ITK_DATA_ROOT}/Input/HeadMRVolume.mhd,HeadMRVolume.raw} ${ITK_TEST_OUTPUT_DIR}/HeadMRVolume.mhd
-    )
+  COMMAND IOScancoTestDriver
+    itkScancoImageIOTest
+      /home/matt/data/BPBPHumerus/00004180-phantom-2014.0620/C0003665.ISQ
+      ${ITK_TEST_OUTPUT_DIR}/C0003665.mha
+  )
