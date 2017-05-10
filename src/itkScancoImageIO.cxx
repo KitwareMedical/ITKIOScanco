@@ -913,6 +913,7 @@ ScancoImageIO
   size_t outSize = xsize;
   outSize *= ysize;
   outSize *= zsize;
+  outSize *= this->GetComponentSize();
 
   // For the input (compressed) data
   char *input = 0;
