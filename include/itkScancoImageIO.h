@@ -173,6 +173,8 @@ private:
 
   int ReadAIMHeader(std::ifstream *file, unsigned long bytesRead);
 
+  void WriteISQHeader(std::ofstream *file);
+
   // Header information
   char Version[18];
   char PatientName[42];
@@ -206,7 +208,7 @@ private:
   double RescaleSlope;
   double RescaleIntercept;
   double MuWater;
-  char *RawHeader;
+  char *m_RawHeader;
 
   // The compression mode, if any.
   int Compression;
