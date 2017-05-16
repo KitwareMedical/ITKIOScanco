@@ -181,6 +181,18 @@ public:
   itkGetConstMacro( SampleTime, double );
   itkSetMacro( SampleTime, double );
 
+  itkGetConstMacro( MeasurementIndex, int );
+  itkSetMacro( MeasurementIndex, int );
+
+  itkGetConstMacro( Site, int );
+  itkSetMacro( Site, int );
+
+  itkGetConstMacro( ReferenceLine, int );
+  itkSetMacro( ReferenceLine, int );
+
+  itkGetConstMacro( ReconstructionAlg, int );
+  itkSetMacro( ReconstructionAlg, int );
+
 protected:
   ScancoImageIO();
   ~ScancoImageIO();
@@ -251,10 +263,10 @@ private:
   double m_ScanDistance;
   double m_SampleTime;
   int m_ScannerType;
-  int MeasurementIndex;
-  int Site;
-  int ReconstructionAlg;
-  double ReferenceLine;
+  int m_MeasurementIndex;
+  int m_Site;
+  int m_ReconstructionAlg;
+  double m_ReferenceLine;
   double Energy;
   double Intensity;
   int RescaleType;
