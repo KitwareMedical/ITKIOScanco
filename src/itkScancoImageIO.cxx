@@ -37,6 +37,7 @@
 #include "itkIntTypes.h"
 
 #include <algorithm>
+#include <ctime>
 
 namespace itk
 {
@@ -203,6 +204,21 @@ ScancoImageIO
   second = static_cast<int>(time / millisPerSecond);
   time -= second*millisPerSecond;
   millis = static_cast<int>(time);
+}
+
+
+void
+ScancoImageIO
+::EncodeDate(void * target)
+{
+  time_t currentTimeUnix;
+  std::time(&currentTimeUnix);
+  const uint64_t currentTimeVMS = currentTimeUnix * 10000000 + 3506716800;
+
+  const int d1 = (int)currentTimeVMS;
+  const int d2 = (int)(currentTimeVMS >> 32);
+  ScancoImageIO::EncodeInt( d1, target );
+  ScancoImageIO::EncodeInt( d2, static_cast<char *>(target)+4 );
 }
 
 
@@ -1129,6 +1145,7 @@ ScancoImageIO
   /*int numBlocks = ScancoImageIO::DecodeInt(h);*/ header += 4;
   ScancoImageIO::EncodeInt( this->m_PatientIndex, header ); header += 4;
   ScancoImageIO::EncodeInt( this->m_ScannerID, header ); header += 4;
+  ScancoImageIO::EncodeDate( header ); header += 8;
 
   file->write(this->m_RawHeader, 512);
 }
