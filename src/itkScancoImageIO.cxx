@@ -265,8 +265,8 @@ ScancoImageIO
   this->m_ScannerID = 0;
   this->m_SliceThickness = 0;
   this->m_SliceIncrement = 0;
-  this->StartPosition = 0;
-  this->EndPosition = 0;
+  this->m_StartPosition = 0;
+  this->m_EndPosition = 0;
   this->ZPosition = 0;
   this->DataRange[0] = 0;
   this->DataRange[1] = 0;
@@ -368,17 +368,17 @@ ScancoImageIO
     this->Energy = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->Intensity = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->ReferenceLine = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->StartPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->EndPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_StartPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_EndPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     h += 88*4;
     }
   else // ISQ file or RSQ file
     {
     this->m_SliceThickness = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->m_SliceIncrement = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->StartPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->EndPosition =
-      this->StartPosition + physdim[2]*1e-3*(pixdim[2] - 1)/pixdim[2];
+    this->m_StartPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_EndPosition =
+      this->m_StartPosition + physdim[2]*1e-3*(pixdim[2] - 1)/pixdim[2];
     this->DataRange[0] = ScancoImageIO::DecodeInt(h); h += 4;
     this->DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
     this->MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
@@ -775,9 +775,9 @@ ScancoImageIO
         }
       else if (skey == "Position Slice 1 [um]")
         {
-        this->StartPosition = strtod(value, 0)*1e-3;
-        this->EndPosition =
-          this->StartPosition + elementSize[2]*(structValues[5] - 1);
+        this->m_StartPosition = strtod(value, 0)*1e-3;
+        this->m_EndPosition =
+          this->m_StartPosition + elementSize[2]*(structValues[5] - 1);
         }
       else if (skey == "No. samples")
         {
@@ -1158,6 +1158,7 @@ ScancoImageIO
     }
   ScancoImageIO::EncodeInt( (int)(this->m_SliceThickness * 1e3 ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_SliceIncrement * 1e3 ), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_StartPosition * 1e3 ), header ); header += 4;
 
   file->write(this->m_RawHeader, 512);
 }
