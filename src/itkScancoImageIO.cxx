@@ -114,6 +114,18 @@ ScancoImageIO
 }
 
 
+void
+ScancoImageIO
+::EncodeInt(int data, void *target)
+{
+  unsigned char * targetAsUnsignedChar = static_cast< unsigned char * >( target );
+  targetAsUnsignedChar[0] = (unsigned char)(data);
+  targetAsUnsignedChar[1] = (unsigned char)(data >> 8);
+  targetAsUnsignedChar[2] = (unsigned char)(data >> 16);
+  targetAsUnsignedChar[3] = (unsigned char)(data >> 24);
+}
+
+
 float
 ScancoImageIO
 ::DecodeFloat(const void *data)
@@ -223,7 +235,7 @@ void
 ScancoImageIO
 ::InitializeHeader()
 {
-  memset(this->Version, 0, 18);
+  memset(this->m_Version, 0, 18);
   memset(this->PatientName, 0, 42);
   memset(this->CreationDate, 0, 32);
   memset(this->ModificationDate, 0, 32);
@@ -233,7 +245,7 @@ ScancoImageIO
   this->ScanDimensionsPhysical[0] = 0;
   this->ScanDimensionsPhysical[1] = 0;
   this->ScanDimensionsPhysical[2] = 0;
-  this->PatientIndex = 0;
+  this->m_PatientIndex = 0;
   this->ScannerID = 0;
   this->SliceThickness = 0;
   this->SliceIncrement = 0;
@@ -268,18 +280,33 @@ ScancoImageIO
 
 void
 ScancoImageIO
-::StripString(char *dest, const char *cp, size_t l)
+::StripString(char *dest, const char *source, size_t length)
 {
   char *dp = dest;
-  for (size_t i = 0; i < l && *cp != '\0'; ++i)
+  for (size_t i = 0; i < length && *source != '\0'; ++i)
     {
-    *dp++ = *cp++;
+    *dp++ = *source++;
     }
   while (dp != dest && dp[-1] == ' ')
     {
     --dp;
     }
   *dp = '\0';
+}
+
+
+void
+ScancoImageIO
+::PadString(char *dest, const char *source, size_t length)
+{
+  for (size_t i = 0; i < length && *source != '\0'; ++i)
+    {
+    *dest++ = *source++;
+    }
+  for (size_t i = 0; i < length; ++i)
+    {
+    *dest++ = '\0';
+    }
 }
 
 
@@ -293,11 +320,11 @@ ScancoImageIO
     }
 
   char *h = this->m_RawHeader;
-  ScancoImageIO::StripString(this->Version, h, 16); h += 16;
+  ScancoImageIO::StripString(this->m_Version, h, 16); h += 16;
   int dataType = ScancoImageIO::DecodeInt(h); h += 4;
   /*int numBytes = ScancoImageIO::DecodeInt(h);*/ h += 4;
   /*int numBlocks = ScancoImageIO::DecodeInt(h);*/ h += 4;
-  this->PatientIndex = ScancoImageIO::DecodeInt(h); h += 4;
+  this->m_PatientIndex = ScancoImageIO::DecodeInt(h); h += 4;
   this->ScannerID = ScancoImageIO::DecodeInt(h); h += 4;
   int year, month, day, hour, minute, second, milli;
   ScancoImageIO::DecodeDate(
@@ -512,7 +539,7 @@ ScancoImageIO
     {
     // header uses 64-bit ints (8 bytes)
     intSize = 8;
-    strcpy(this->Version, h);
+    strcpy(this->m_Version, h);
     headerSize = 16;
     h += headerSize;
     }
@@ -520,7 +547,7 @@ ScancoImageIO
     {
     // header uses 32-bit ints (4 bytes)
     intSize = 4;
-    strcpy(this->Version, "AIMDATA_V020   ");
+    strcpy(this->m_Version, "AIMDATA_V020   ");
     }
 
   // read the pre-header
@@ -712,7 +739,7 @@ ScancoImageIO
         }
       else if (skey == "Index Patient")
         {
-        this->PatientIndex = strtol(value, 0, 10);
+        this->m_PatientIndex = strtol(value, 0, 10);
         }
       else if (skey == "Index Measurement")
         {
@@ -902,7 +929,7 @@ ScancoImageIO
 
   // get the size of the compressed data
   int intSize = 4;
-  if (strcmp(this->Version, "AIMDATA_V030   ") == 0)
+  if (strcmp(this->m_Version, "AIMDATA_V030   ") == 0)
     {
     // header uses 64-bit ints (8 bytes)
     intSize = 8;
@@ -1095,7 +1122,12 @@ ScancoImageIO
   this->m_RawHeader = new char[512];
   char * header = this->m_RawHeader;
 
-  memcpy(header, "CTDATA-HEADER_V1", 16);
+  ScancoImageIO::PadString( header, this->m_Version, 16 ); header +=16;
+  // 3 -> ISQ data type
+  ScancoImageIO::EncodeInt( 3, header ); header += 4;
+  /*int numBytes = ScancoImageIO::DecodeInt(h);*/ header += 4;
+  /*int numBlocks = ScancoImageIO::DecodeInt(h);*/ header += 4;
+  ScancoImageIO::EncodeInt( this->m_PatientIndex, header ); header += 4;
 
   file->write(this->m_RawHeader, 512);
 }

@@ -131,6 +131,19 @@ public:
     return false;
   }
 
+  /** Get a string that states the version of the file header.
+   * Max size: 18 characters. */
+  const char *GetVersion() const { return this->m_Version; }
+  void SetVersion( const char * version )
+    {
+    strcpy(this->m_Version, version);
+    this->Modified();
+    }
+
+  itkGetConstMacro( PatientIndex, int );
+  itkSetMacro( PatientIndex, int );
+
+
 protected:
   ScancoImageIO();
   ~ScancoImageIO();
@@ -149,6 +162,8 @@ private:
 
   /** Convert char data to 32-bit int (little-endian). */
   static int DecodeInt(const void *data);
+  /** Convert 32-bit int (little-endian) to char data. */
+  static void EncodeInt(int data, void * target);
 
   /** Convert char data to float (single precision). */
   static float DecodeFloat(const void *data);
@@ -166,6 +181,7 @@ private:
    *  The dest must have a size of at least l+1.
    */
   static void StripString(char *dest, const char *source, size_t l);
+  static void PadString(char *dest, const char *source, size_t l);
 
   void InitializeHeader();
 
@@ -176,9 +192,9 @@ private:
   void WriteISQHeader(std::ofstream *file);
 
   // Header information
-  char Version[18];
+  char m_Version[18];
   char PatientName[42];
-  int PatientIndex;
+  int m_PatientIndex;
   int ScannerID;
   char CreationDate[32];
   char ModificationDate[32];
