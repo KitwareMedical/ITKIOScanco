@@ -268,8 +268,8 @@ ScancoImageIO
   this->m_StartPosition = 0;
   this->m_EndPosition = 0;
   this->ZPosition = 0;
-  this->DataRange[0] = 0;
-  this->DataRange[1] = 0;
+  this->m_DataRange[0] = 0;
+  this->m_DataRange[1] = 0;
   this->MuScaling = 1.0;
   this->NumberOfSamples = 0;
   this->NumberOfProjections = 0;
@@ -358,8 +358,8 @@ ScancoImageIO
   if (isRAD) // RAD file
     {
     this->MeasurementIndex = ScancoImageIO::DecodeInt(h); h += 4;
-    this->DataRange[0] = ScancoImageIO::DecodeInt(h); h += 4;
-    this->DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
+    this->m_DataRange[0] = ScancoImageIO::DecodeInt(h); h += 4;
+    this->m_DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
     this->MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
     ScancoImageIO::StripString(this->PatientName, h, 40); h += 40;
     this->ZPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
@@ -379,8 +379,8 @@ ScancoImageIO
     this->m_StartPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->m_EndPosition =
       this->m_StartPosition + physdim[2]*1e-3*(pixdim[2] - 1)/pixdim[2];
-    this->DataRange[0] = ScancoImageIO::DecodeInt(h); h += 4;
-    this->DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
+    this->m_DataRange[0] = ScancoImageIO::DecodeInt(h); h += 4;
+    this->m_DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
     this->MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
     this->NumberOfSamples = ScancoImageIO::DecodeInt(h); h += 4;
     this->NumberOfProjections = ScancoImageIO::DecodeInt(h); h += 4;
@@ -817,11 +817,11 @@ ScancoImageIO
         }
       else if (skey == "Minimum data value")
         {
-        this->DataRange[0] = strtod(value, 0);
+        this->m_DataRange[0] = strtod(value, 0);
         }
       else if (skey == "Maximum data value")
         {
-        this->DataRange[1] = strtod(value, 0);
+        this->m_DataRange[1] = strtod(value, 0);
         }
       else if (skey == "Calib. default unit type")
         {
