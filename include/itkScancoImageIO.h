@@ -146,6 +146,12 @@ public:
   itkGetConstMacro( ScannerID, int );
   itkSetMacro( ScannerID, int );
 
+  itkGetConstMacro( SliceThickness, double );
+  itkSetMacro( SliceThickness, double );
+
+  itkGetConstMacro( SliceIncrement, double );
+  itkSetMacro( SliceIncrement, double );
+
 protected:
   ScancoImageIO();
   ~ScancoImageIO();
@@ -204,8 +210,8 @@ private:
   char ModificationDate[32];
   int ScanDimensionsPixels[3];
   double ScanDimensionsPhysical[3];
-  double SliceThickness;
-  double SliceIncrement;
+  double m_SliceThickness;
+  double m_SliceIncrement;
   double StartPosition;
   double EndPosition;
   double ZPosition;

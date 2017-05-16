@@ -263,8 +263,8 @@ ScancoImageIO
   this->ScanDimensionsPhysical[2] = 0;
   this->m_PatientIndex = 0;
   this->m_ScannerID = 0;
-  this->SliceThickness = 0;
-  this->SliceIncrement = 0;
+  this->m_SliceThickness = 0;
+  this->m_SliceIncrement = 0;
   this->StartPosition = 0;
   this->EndPosition = 0;
   this->ZPosition = 0;
@@ -374,8 +374,8 @@ ScancoImageIO
     }
   else // ISQ file or RSQ file
     {
-    this->SliceThickness = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->SliceIncrement = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_SliceThickness = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_SliceIncrement = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->StartPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->EndPosition =
       this->StartPosition + physdim[2]*1e-3*(pixdim[2] - 1)/pixdim[2];
@@ -399,17 +399,17 @@ ScancoImageIO
 
   int dataOffset = ScancoImageIO::DecodeInt(h);
 
-  // fix SliceThickness and SliceIncrement if they were truncated
+  // fix m_SliceThickness and m_SliceIncrement if they were truncated
   if (physdim[2] != 0)
     {
     double computedSpacing = physdim[2]*1e-3/pixdim[2];
-    if (fabs(computedSpacing - this->SliceThickness) < 1.1e-3)
+    if (fabs(computedSpacing - this->m_SliceThickness) < 1.1e-3)
       {
-      this->SliceThickness = computedSpacing;
+      this->m_SliceThickness = computedSpacing;
       }
-    if (fabs(computedSpacing - this->SliceIncrement) < 1.1e-3)
+    if (fabs(computedSpacing - this->m_SliceIncrement) < 1.1e-3)
       {
-      this->SliceIncrement = computedSpacing;
+      this->m_SliceIncrement = computedSpacing;
       }
     }
 
@@ -863,8 +863,8 @@ ScancoImageIO
     }
 
   // these items are not in the processing log
-  this->SliceThickness = elementSize[2];
-  this->SliceIncrement = elementSize[2];
+  this->m_SliceThickness = elementSize[2];
+  this->m_SliceIncrement = elementSize[2];
 
   return 1;
 }
@@ -1146,6 +1146,18 @@ ScancoImageIO
   ScancoImageIO::EncodeInt( this->m_PatientIndex, header ); header += 4;
   ScancoImageIO::EncodeInt( this->m_ScannerID, header ); header += 4;
   ScancoImageIO::EncodeDate( header ); header += 8;
+  for( unsigned int dimension = 0; dimension < 3; ++dimension )
+    {
+    // pixdim
+    ScancoImageIO::EncodeInt( this->GetDimensions( dimension ), header ); header +=4;
+    }
+  for( unsigned int dimension = 0; dimension < 3; ++dimension )
+    {
+    // physdim
+    ScancoImageIO::EncodeInt( this->GetSpacing( dimension ) * this->GetDimensions( dimension ) * 1e3 , header ); header +=4;
+    }
+  ScancoImageIO::EncodeInt( (int)(this->m_SliceThickness * 1e3 ), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_SliceIncrement * 1e3 ), header ); header += 4;
 
   file->write(this->m_RawHeader, 512);
 }
