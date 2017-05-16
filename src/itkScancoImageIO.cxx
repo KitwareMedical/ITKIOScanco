@@ -290,7 +290,7 @@ ScancoImageIO
   this->RescaleIntercept = 0.0;
   this->MuWater = 0;
 
-  this->Compression = 0;
+  this->m_Compression = 0;
 }
 
 
@@ -611,7 +611,7 @@ ScancoImageIO
 
   // number of components per pixel is 1 by default
   this->SetPixelType( SCALAR );
-  this->Compression = 0;
+  this->m_Compression = 0;
 
   // a limited selection of data types are supported
   // (only 0x00010001 (char) and 0x00020002 (short) are fully tested)
@@ -649,15 +649,15 @@ ScancoImageIO
       this->SetComponentType( FLOAT );
       break;
     case 0x00150001:
-      this->Compression = 0x00b2; // run-length compressed bits
+      this->m_Compression = 0x00b2; // run-length compressed bits
       this->SetComponentType( CHAR );
       break;
     case 0x00080002:
-      this->Compression = 0x00c2; // run-length compressed signed char
+      this->m_Compression = 0x00c2; // run-length compressed signed char
       this->SetComponentType( CHAR );
       break;
     case 0x00060001:
-      this->Compression = 0x00b1; // packed bits
+      this->m_Compression = 0x00b1; // packed bits
       this->SetComponentType( CHAR );
       break;
     default:
@@ -964,12 +964,12 @@ ScancoImageIO
   char *input = 0;
   size_t size = 0;
 
-  if(this->Compression == 0)
+  if(this->m_Compression == 0)
     {
     infile.read(reinterpret_cast< char * >( buffer ), outSize);
     return;
     }
-  else if (this->Compression == 0x00b1)
+  else if (this->m_Compression == 0x00b1)
     {
     // Compute the size of the binary packed data
     size_t xinc = (xsize+1)/2;
@@ -979,8 +979,8 @@ ScancoImageIO
     input = new char[size];
     infile.read(input, size);
     }
-  else if (this->Compression == 0x00b2 ||
-           this->Compression == 0x00c2)
+  else if (this->m_Compression == 0x00b2 ||
+           this->m_Compression == 0x00c2)
     {
     // Get the size of the compressed data
     char head[8];
@@ -1009,7 +1009,7 @@ ScancoImageIO
 
   unsigned char * dataPtr = reinterpret_cast< unsigned char * >( buffer );
 
-  if (this->Compression == 0x00b1)
+  if (this->m_Compression == 0x00b1)
   {
     // Unpack binary data, each byte becomes a 2x2x2 block of voxels
     size_t xinc = (xsize+1)/2;
@@ -1036,7 +1036,7 @@ ScancoImageIO
       bit ^= 4;
     }
   }
-  else if (this->Compression == 0x00b2)
+  else if (this->m_Compression == 0x00b2)
   {
     // Decompress binary run-lengths
     bool flip = 0;
@@ -1072,7 +1072,7 @@ ScancoImageIO
       while (--size != 0 && outSize != 0);
     }
   }
-  else if (this->Compression == 0x00c2)
+  else if (this->m_Compression == 0x00c2)
   {
     // Decompress 8-bit run-lengths
     char *inPtr = input;
@@ -1169,11 +1169,19 @@ ScancoImageIO
   ScancoImageIO::EncodeInt( (int)(this->m_SampleTime * 1e3 ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_MeasurementIndex), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_Site), header ); header += 4;
-  ScancoImageIO::EncodeInt( (int)(this->m_ReferenceLine), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_ReferenceLine * 1e3), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_ReconstructionAlg), header ); header += 4;
   ScancoImageIO::PadString( header, this->m_PatientName, 40 ); header +=40;
   ScancoImageIO::EncodeInt( (int)(this->m_Energy * 1e3 ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_Intensity * 1e3 ), header ); header += 4;
+  ScancoImageIO::EncodeInt( 0x00, header ); header += 4;
+  header += 82 * 4;
+  // dataOffset
+  const int dataOffset = 0;
+  ScancoImageIO::EncodeInt( dataOffset, header ); header += 4;
+
+  this->m_HeaderSize = static_cast< SizeValueType >( dataOffset + 1 ) * 512;
+  this->m_Compression = 0;
 
   file->write(this->m_RawHeader, 512);
 }
@@ -1581,7 +1589,7 @@ ScancoImageIO
     //free(transformMatrix);
     //}
 
-  //m_ScancoImage.CompressedData(m_UseCompression);
+  //m_ScancoImage.CompressedData(m_Usem_Compression);
 
   //// this is a check to see if we are actually streaming
   //// we initialize with m_IORegion to match dimensions
@@ -1592,9 +1600,9 @@ ScancoImageIO
     //largestRegion.SetSize( ii, this->GetDimensions(ii) );
     //}
 
-  //if ( m_UseCompression && ( largestRegion != m_IORegion ) )
+  //if ( m_Usem_Compression && ( largestRegion != m_IORegion ) )
     //{
-    //std::cout << "Compression in use: cannot stream the file writing" << std::endl;
+    //std::cout << "m_Compression in use: cannot stream the file writing" << std::endl;
     //}
   //else if (  largestRegion != m_IORegion )
     //{

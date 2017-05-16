@@ -132,7 +132,7 @@ public:
   }
 
   /** Get a string that states the version of the file header.
-   * Max size: 18 characters. */
+   * Max size: 16 characters. */
   const char *GetVersion() const { return this->m_Version; }
   void SetVersion( const char * version )
     {
@@ -194,7 +194,7 @@ public:
   itkSetMacro( ReconstructionAlg, int );
 
   /** Get a string that states patient name.
-   * Max size: 42 characters. */
+   * Max size: 40 characters. */
   const char *GetPatientName() const { return this->m_PatientName; }
   void SetPatientName( const char * version )
     {
@@ -293,7 +293,7 @@ private:
   char *m_RawHeader;
 
   // The compression mode, if any.
-  int Compression;
+  int m_Compression;
 
   SizeValueType m_HeaderSize;
 };
