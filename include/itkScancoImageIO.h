@@ -202,6 +202,12 @@ public:
     this->Modified();
     }
 
+  itkGetConstMacro( Energy, double );
+  itkSetMacro( Energy, double );
+
+  itkGetConstMacro( Intensity, double );
+  itkSetMacro( Intensity, double );
+
 protected:
   ScancoImageIO();
   ~ScancoImageIO();
@@ -276,8 +282,8 @@ private:
   int m_Site;
   int m_ReconstructionAlg;
   double m_ReferenceLine;
-  double Energy;
-  double Intensity;
+  double m_Energy;
+  double m_Intensity;
   int RescaleType;
   char RescaleUnits[18];
   char CalibrationData[66];

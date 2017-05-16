@@ -280,8 +280,8 @@ ScancoImageIO
   this->m_Site = 0;
   this->m_ReconstructionAlg = 0;
   this->m_ReferenceLine = 0;
-  this->Energy = 0;
-  this->Intensity = 0;
+  this->m_Energy = 0;
+  this->m_Intensity = 0;
 
   this->RescaleType = 0;
   memset(this->RescaleUnits, 0, 18);
@@ -321,7 +321,7 @@ ScancoImageIO
     }
   for (size_t i = 0; i < length; ++i)
     {
-    *dest++ = '\0';
+    *dest++ = ' ';
     }
 }
 
@@ -365,8 +365,8 @@ ScancoImageIO
     this->ZPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     /* unknown */ h += 4;
     this->m_SampleTime = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->Energy = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->Intensity = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_Energy = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_Intensity = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->m_ReferenceLine = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->m_StartPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->m_EndPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
@@ -392,8 +392,8 @@ ScancoImageIO
     this->m_ReferenceLine = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->m_ReconstructionAlg = ScancoImageIO::DecodeInt(h); h += 4;
     ScancoImageIO::StripString(this->m_PatientName, h, 40); h += 40;
-    this->Energy = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->Intensity = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_Energy = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_Intensity = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     h += 83*4;
     }
 
@@ -805,11 +805,11 @@ ScancoImageIO
         }
       else if (skey == "Energy [V]")
         {
-        this->Energy = strtod(value, 0)*1e-3;
+        this->m_Energy = strtod(value, 0)*1e-3;
         }
       else if (skey == "Intensity [uA]")
         {
-        this->Intensity = strtod(value, 0)*1e-3;
+        this->m_Intensity = strtod(value, 0)*1e-3;
         }
       else if (skey == "Mu_Scaling")
         {
@@ -1172,6 +1172,8 @@ ScancoImageIO
   ScancoImageIO::EncodeInt( (int)(this->m_ReferenceLine), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_ReconstructionAlg), header ); header += 4;
   ScancoImageIO::PadString( header, this->m_PatientName, 40 ); header +=40;
+  ScancoImageIO::EncodeInt( (int)(this->m_Energy * 1e3 ), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_Intensity * 1e3 ), header ); header += 4;
 
   file->write(this->m_RawHeader, 512);
 }
