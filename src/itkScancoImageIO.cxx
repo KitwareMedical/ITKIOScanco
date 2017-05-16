@@ -274,7 +274,7 @@ ScancoImageIO
   this->m_NumberOfSamples = 0;
   this->m_NumberOfProjections = 0;
   this->m_ScanDistance = 0;
-  this->SampleTime = 0;
+  this->m_SampleTime = 0;
   this->m_ScannerType = 0;
   this->MeasurementIndex = 0;
   this->Site = 0;
@@ -364,7 +364,7 @@ ScancoImageIO
     ScancoImageIO::StripString(this->PatientName, h, 40); h += 40;
     this->ZPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     /* unknown */ h += 4;
-    this->SampleTime = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_SampleTime = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->Energy = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->Intensity = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->ReferenceLine = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
@@ -386,7 +386,7 @@ ScancoImageIO
     this->m_NumberOfProjections = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_ScanDistance = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->m_ScannerType = ScancoImageIO::DecodeInt(h); h += 4;
-    this->SampleTime = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_SampleTime = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->MeasurementIndex = ScancoImageIO::DecodeInt(h); h += 4;
     this->Site = ScancoImageIO::DecodeInt(h); h += 4;
     this->ReferenceLine = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
@@ -793,7 +793,7 @@ ScancoImageIO
         }
       else if (skey == "Integration time [us]")
         {
-        this->SampleTime = strtod(value, 0)*1e-3;
+        this->m_SampleTime = strtod(value, 0)*1e-3;
         }
       else if (skey == "Reference line [um]")
         {
@@ -1166,6 +1166,7 @@ ScancoImageIO
   ScancoImageIO::EncodeInt( this->m_NumberOfProjections, header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_ScanDistance * 1e3 ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_ScannerType), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_SampleTime * 1e3 ), header ); header += 4;
 
   file->write(this->m_RawHeader, 512);
 }
