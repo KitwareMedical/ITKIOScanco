@@ -271,7 +271,7 @@ ScancoImageIO
   this->m_DataRange[0] = 0;
   this->m_DataRange[1] = 0;
   this->m_MuScaling = 1.0;
-  this->NumberOfSamples = 0;
+  this->m_NumberOfSamples = 0;
   this->NumberOfProjections = 0;
   this->ScanDistance = 0;
   this->SampleTime = 0;
@@ -382,7 +382,7 @@ ScancoImageIO
     this->m_DataRange[0] = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
-    this->NumberOfSamples = ScancoImageIO::DecodeInt(h); h += 4;
+    this->m_NumberOfSamples = ScancoImageIO::DecodeInt(h); h += 4;
     this->NumberOfProjections = ScancoImageIO::DecodeInt(h); h += 4;
     this->ScanDistance = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->ScannerType = ScancoImageIO::DecodeInt(h); h += 4;
@@ -781,7 +781,7 @@ ScancoImageIO
         }
       else if (skey == "No. samples")
         {
-        this->NumberOfSamples = strtol(value, 0, 10);
+        this->m_NumberOfSamples = strtol(value, 0, 10);
         }
       else if (skey == "No. projections per 180")
         {
@@ -1162,6 +1162,7 @@ ScancoImageIO
   ScancoImageIO::EncodeInt( (int)(this->m_DataRange[0] ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_DataRange[1] ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_MuScaling ), header ); header += 4;
+  ScancoImageIO::EncodeInt( this->m_NumberOfSamples, header ); header += 4;
 
   file->write(this->m_RawHeader, 512);
 }
