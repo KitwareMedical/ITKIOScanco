@@ -273,9 +273,9 @@ ScancoImageIO
   this->m_MuScaling = 1.0;
   this->m_NumberOfSamples = 0;
   this->m_NumberOfProjections = 0;
-  this->ScanDistance = 0;
+  this->m_ScanDistance = 0;
   this->SampleTime = 0;
-  this->ScannerType = 0;
+  this->m_ScannerType = 0;
   this->MeasurementIndex = 0;
   this->Site = 0;
   this->ReconstructionAlg = 0;
@@ -384,8 +384,8 @@ ScancoImageIO
     this->m_MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_NumberOfSamples = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_NumberOfProjections = ScancoImageIO::DecodeInt(h); h += 4;
-    this->ScanDistance = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
-    this->ScannerType = ScancoImageIO::DecodeInt(h); h += 4;
+    this->m_ScanDistance = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_ScannerType = ScancoImageIO::DecodeInt(h); h += 4;
     this->SampleTime = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->MeasurementIndex = ScancoImageIO::DecodeInt(h); h += 4;
     this->Site = ScancoImageIO::DecodeInt(h); h += 4;
@@ -771,7 +771,7 @@ ScancoImageIO
         }
       else if (skey == "Scanner type")
         {
-        this->ScannerType = strtol(value, 0, 10);
+        this->m_ScannerType = strtol(value, 0, 10);
         }
       else if (skey == "Position Slice 1 [um]")
         {
@@ -789,7 +789,7 @@ ScancoImageIO
         }
       else if (skey == "Scan Distance [um]")
         {
-        this->ScanDistance = strtod(value, 0)*1e-3;
+        this->m_ScanDistance = strtod(value, 0)*1e-3;
         }
       else if (skey == "Integration time [us]")
         {
@@ -1164,6 +1164,8 @@ ScancoImageIO
   ScancoImageIO::EncodeInt( (int)(this->m_MuScaling ), header ); header += 4;
   ScancoImageIO::EncodeInt( this->m_NumberOfSamples, header ); header += 4;
   ScancoImageIO::EncodeInt( this->m_NumberOfProjections, header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_ScanDistance * 1e3 ), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_ScannerType), header ); header += 4;
 
   file->write(this->m_RawHeader, 512);
 }
