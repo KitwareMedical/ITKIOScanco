@@ -270,7 +270,7 @@ ScancoImageIO
   this->ZPosition = 0;
   this->m_DataRange[0] = 0;
   this->m_DataRange[1] = 0;
-  this->MuScaling = 1.0;
+  this->m_MuScaling = 1.0;
   this->NumberOfSamples = 0;
   this->NumberOfProjections = 0;
   this->ScanDistance = 0;
@@ -360,7 +360,7 @@ ScancoImageIO
     this->MeasurementIndex = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_DataRange[0] = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
-    this->MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
+    this->m_MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
     ScancoImageIO::StripString(this->PatientName, h, 40); h += 40;
     this->ZPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     /* unknown */ h += 4;
@@ -381,7 +381,7 @@ ScancoImageIO
       this->m_StartPosition + physdim[2]*1e-3*(pixdim[2] - 1)/pixdim[2];
     this->m_DataRange[0] = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
-    this->MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
+    this->m_MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
     this->NumberOfSamples = ScancoImageIO::DecodeInt(h); h += 4;
     this->NumberOfProjections = ScancoImageIO::DecodeInt(h); h += 4;
     this->ScanDistance = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
@@ -530,9 +530,9 @@ ScancoImageIO
     }
 
   // Include conversion to linear att coeff in the rescaling
-  if (this->MuScaling != 0)
+  if (this->m_MuScaling != 0)
     {
-    this->RescaleSlope /= this->MuScaling;
+    this->RescaleSlope /= this->m_MuScaling;
     }
 
   return 1;
@@ -813,7 +813,7 @@ ScancoImageIO
         }
       else if (skey == "Mu_Scaling")
         {
-        this->MuScaling = strtol(value, 0, 10);
+        this->m_MuScaling = strtol(value, 0, 10);
         }
       else if (skey == "Minimum data value")
         {
@@ -857,9 +857,9 @@ ScancoImageIO
     }
 
   // Include conversion to linear att coeff in the rescaling
-  if (this->MuScaling != 0)
+  if (this->m_MuScaling != 0)
     {
-    this->RescaleSlope /= this->MuScaling;
+    this->RescaleSlope /= this->m_MuScaling;
     }
 
   // these items are not in the processing log
@@ -918,10 +918,10 @@ ScancoImageIO
 
   // This code causes rescaling to Hounsfield units
   /*
-  if (this->MuScaling > 0 && this->MuWater > 0)
+  if (this->m_MuScaling > 0 && this->MuWater > 0)
     {
     // HU = 1000*(u - u_water)/u_water
-    this->RescaleSlope = 1000.0/(this->MuWater * this->MuScaling);
+    this->RescaleSlope = 1000.0/(this->MuWater * this->m_MuScaling);
     this->RescaleIntercept = -1000.0;
     }
   */
@@ -1159,6 +1159,9 @@ ScancoImageIO
   ScancoImageIO::EncodeInt( (int)(this->m_SliceThickness * 1e3 ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_SliceIncrement * 1e3 ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_StartPosition * 1e3 ), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_DataRange[0] ), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_DataRange[1] ), header ); header += 4;
+  ScancoImageIO::EncodeInt( (int)(this->m_MuScaling ), header ); header += 4;
 
   file->write(this->m_RawHeader, 512);
 }

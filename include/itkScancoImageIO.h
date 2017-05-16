@@ -163,6 +163,9 @@ public:
     this->m_DataRange[1] = dataRange[1];
     }
 
+  itkGetConstMacro( MuScaling, double );
+  itkSetMacro( MuScaling, double );
+
 protected:
   ScancoImageIO();
   ~ScancoImageIO();
@@ -227,7 +230,7 @@ private:
   double m_EndPosition;
   double ZPosition;
   double m_DataRange[2];
-  double MuScaling;
+  double m_MuScaling;
   int NumberOfSamples;
   int NumberOfProjections;
   double ScanDistance;
