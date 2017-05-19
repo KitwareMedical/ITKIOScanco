@@ -29,7 +29,7 @@ int itkScancoImageIOTest2(int argc, char* argv[])
 {
   if( argc < 3 )
     {
-    std::cerr << "Usage: " << argv[0] << " Input Output \n";
+    std::cerr << "Usage: " << argv[0] << " Input Output [ReUseIO]\n";
     return EXIT_FAILURE;
     }
   const std::string inputFileName = argv[1];
@@ -95,21 +95,21 @@ int itkScancoImageIOTest2(int argc, char* argv[])
   std::cout << "Intensity: \t\t" << scancoIO->GetIntensity() << std::endl;
   TEST_EXPECT_TRUE( itk::Math::FloatAlmostEqual( scancoIO->GetIntensity(), 0.177, 6, 1e-3 ) );
 
-  TEST_EXPECT_TRUE( scancoIO->CanWriteFile( outputFileName.c_str() ) );
+  // Generate test image
+  typedef itk::ImageFileWriter< ImageType > WriterType;
+  WriterType::Pointer writer = WriterType::New();
+  if( argc > 3 )
+    {
+    TEST_EXPECT_TRUE( scancoIO->CanWriteFile( outputFileName.c_str() ) );
 
-  TEST_EXPECT_TRUE( !scancoIO->CanWriteFile( (outputFileName + ".exe").c_str() ) );
+    TEST_EXPECT_TRUE( !scancoIO->CanWriteFile( (outputFileName + ".exe").c_str() ) );
 
-  scancoIO->SetFileName( outputFileName );
-  scancoIO->WriteImageInformation();
-
-  //// Generate test image
-  //typedef itk::ImageFileWriter< ImageType > WriterType;
-  //WriterType::Pointer writer = WriterType::New();
-  ////IOType::Pointer metaOut = IOType::New();
-  ////writer->SetImageIO(metaOut);
-  //writer->SetInput( reader->GetOutput() );
-  //writer->SetFileName( outputFileName );
-  ////TRY_EXPECT_NO_EXCEPTION( writer->Update() );
+    writer->SetImageIO( scancoIO );
+    scancoIO->SetPatientName( "McCormick" );
+    }
+  writer->SetInput( reader->GetOutput() );
+  writer->SetFileName( outputFileName );
+  TRY_EXPECT_NO_EXCEPTION( writer->Update() );
 
   return EXIT_SUCCESS;
 }
