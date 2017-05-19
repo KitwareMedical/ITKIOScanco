@@ -41,8 +41,8 @@
  * the data values can be converted to calibrated units.  To convert
  * to linear attenuation coefficients [cm^-1], simply divide the data
  * values by the MuScaling.  To convert to density values, multiply
- * the data values by the RescaleSlope and add the RescaleIntercept.
- * To convert to Hounsfield units, multiply by 1000/(MuScaling*MuWater)
+ * the data values by the m_RescaleSlope and add the m_RescaleIntercept.
+ * To convert to Hounsfield units, multiply by 1000/(MuScaling*m_MuWater)
  * and subtract 1000.
  *
  * Created at the Calgary Image Processing and Analysis Centre (CIPAC).
@@ -258,39 +258,39 @@ private:
   void WriteISQHeader(std::ofstream *file);
 
   // Header information
-  char m_Version[18];
-  char m_PatientName[42];
-  int m_PatientIndex;
-  int m_ScannerID;
-  char CreationDate[32];
-  char ModificationDate[32];
-  int ScanDimensionsPixels[3];
+  char   m_Version[18];
+  char   m_PatientName[42];
+  int    m_PatientIndex;
+  int    m_ScannerID;
+  char   CreationDate[32];
+  char   ModificationDate[32];
+  int    ScanDimensionsPixels[3];
   double ScanDimensionsPhysical[3];
   double m_SliceThickness;
   double m_SliceIncrement;
   double m_StartPosition;
   double m_EndPosition;
-  double ZPosition;
+  double m_ZPosition;
   double m_DataRange[2];
   double m_MuScaling;
-  int m_NumberOfSamples;
-  int m_NumberOfProjections;
+  int    m_NumberOfSamples;
+  int    m_NumberOfProjections;
   double m_ScanDistance;
   double m_SampleTime;
-  int m_ScannerType;
-  int m_MeasurementIndex;
-  int m_Site;
-  int m_ReconstructionAlg;
+  int    m_ScannerType;
+  int    m_MeasurementIndex;
+  int    m_Site;
+  int    m_ReconstructionAlg;
   double m_ReferenceLine;
   double m_Energy;
   double m_Intensity;
-  int RescaleType;
-  char RescaleUnits[18];
-  char CalibrationData[66];
-  double RescaleSlope;
-  double RescaleIntercept;
-  double MuWater;
-  char *m_RawHeader;
+  int    m_RescaleType;
+  char   m_RescaleUnits[18];
+  char   m_CalibrationData[66];
+  double m_RescaleSlope;
+  double m_RescaleIntercept;
+  double m_MuWater;
+  char * m_RawHeader;
 
   // The compression mode, if any.
   int m_Compression;

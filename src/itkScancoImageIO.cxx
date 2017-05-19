@@ -269,7 +269,7 @@ ScancoImageIO
   this->m_SliceIncrement = 0;
   this->m_StartPosition = 0;
   this->m_EndPosition = 0;
-  this->ZPosition = 0;
+  this->m_ZPosition = 0;
   this->m_DataRange[0] = 0;
   this->m_DataRange[1] = 0;
   this->m_MuScaling = 1.0;
@@ -285,12 +285,12 @@ ScancoImageIO
   this->m_Energy = 0;
   this->m_Intensity = 0;
 
-  this->RescaleType = 0;
-  memset(this->RescaleUnits, 0, 18);
-  memset(this->CalibrationData, 0, 66);
-  this->RescaleSlope = 1.0;
-  this->RescaleIntercept = 0.0;
-  this->MuWater = 0;
+  this->m_RescaleType = 0;
+  memset(this->m_RescaleUnits, 0, 18);
+  memset(this->m_CalibrationData, 0, 66);
+  this->m_RescaleSlope = 1.0;
+  this->m_RescaleIntercept = 0.0;
+  this->m_MuWater = 0;
 
   this->m_Compression = 0;
 }
@@ -364,7 +364,7 @@ ScancoImageIO
     this->m_DataRange[1] = ScancoImageIO::DecodeInt(h); h += 4;
     this->m_MuScaling = ScancoImageIO::DecodeInt(h); h += 4;
     ScancoImageIO::StripString(this->m_PatientName, h, 40); h += 40;
-    this->ZPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
+    this->m_ZPosition = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     /* unknown */ h += 4;
     this->m_SampleTime = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
     this->m_Energy = ScancoImageIO::DecodeInt(h)*1e-3; h += 4;
@@ -518,23 +518,23 @@ ScancoImageIO
     if (calHeader && calHeaderSize >= 1024)
       {
       h = calHeader;
-      ScancoImageIO::StripString(this->CalibrationData, h + 28, 64);
+      ScancoImageIO::StripString(this->m_CalibrationData, h + 28, 64);
       // std::string calFile(h + 112, 256);
       // std::string s3(h + 376, 256);
-      this->RescaleType = ScancoImageIO::DecodeInt(h + 632);
-      ScancoImageIO::StripString(this->RescaleUnits, h + 648, 16);
+      this->m_RescaleType = ScancoImageIO::DecodeInt(h + 632);
+      ScancoImageIO::StripString(this->m_RescaleUnits, h + 648, 16);
       // std::string s5(h + 700, 16);
       // std::string calFilter(h + 772, 16);
-      this->RescaleSlope = ScancoImageIO::DecodeDouble(h + 664);
-      this->RescaleIntercept = ScancoImageIO::DecodeDouble(h + 672);
-      this->MuWater = ScancoImageIO::DecodeDouble(h + 688);
+      this->m_RescaleSlope = ScancoImageIO::DecodeDouble(h + 664);
+      this->m_RescaleIntercept = ScancoImageIO::DecodeDouble(h + 672);
+      this->m_MuWater = ScancoImageIO::DecodeDouble(h + 688);
       }
     }
 
   // Include conversion to linear att coeff in the rescaling
   if (this->m_MuScaling != 0)
     {
-    this->RescaleSlope /= this->m_MuScaling;
+    this->m_RescaleSlope /= this->m_MuScaling;
     }
 
   return 1;
@@ -827,31 +827,31 @@ ScancoImageIO
         }
       else if (skey == "Calib. default unit type")
         {
-        this->RescaleType = strtol(value, 0, 10);
+        this->m_RescaleType = strtol(value, 0, 10);
         }
       else if (skey == "Calibration Data")
         {
         valuelen = (valuelen > 64 ? 64 : valuelen);
-        strncpy(this->CalibrationData, value, valuelen);
-        this->CalibrationData[valuelen] = '\0';
+        strncpy(this->m_CalibrationData, value, valuelen);
+        this->m_CalibrationData[valuelen] = '\0';
         }
       else if (skey == "Density: unit")
         {
         valuelen = (valuelen > 16 ? 16 : valuelen);
-        strncpy(this->RescaleUnits, value, valuelen);
-        this->RescaleUnits[valuelen] = '\0';
+        strncpy(this->m_RescaleUnits, value, valuelen);
+        this->m_RescaleUnits[valuelen] = '\0';
         }
       else if (skey == "Density: slope")
         {
-        this->RescaleSlope = strtod(value, 0);
+        this->m_RescaleSlope = strtod(value, 0);
         }
       else if (skey == "Density: intercept")
         {
-        this->RescaleIntercept = strtod(value, 0);
+        this->m_RescaleIntercept = strtod(value, 0);
         }
       else if (skey == "HU: mu water")
         {
-        this->MuWater = strtod(value, 0);
+        this->m_MuWater = strtod(value, 0);
         }
       }
     // skip to the end of the line
@@ -861,7 +861,7 @@ ScancoImageIO
   // Include conversion to linear att coeff in the rescaling
   if (this->m_MuScaling != 0)
     {
-    this->RescaleSlope /= this->m_MuScaling;
+    this->m_RescaleSlope /= this->m_MuScaling;
     }
 
   // these items are not in the processing log
@@ -916,11 +916,11 @@ ScancoImageIO
 
   // This code causes rescaling to Hounsfield units
   /*
-  if (this->m_MuScaling > 0 && this->MuWater > 0)
+  if (this->m_MuScaling > 0 && this->m_MuWater > 0)
     {
     // HU = 1000*(u - u_water)/u_water
-    this->RescaleSlope = 1000.0/(this->MuWater * this->m_MuScaling);
-    this->RescaleIntercept = -1000.0;
+    this->m_RescaleSlope = 1000.0/(this->m_MuWater * this->m_MuScaling);
+    this->m_RescaleIntercept = -1000.0;
     }
   */
 }
@@ -1131,7 +1131,7 @@ ScancoImageIO
   this->m_RawHeader = new char[512];
   char * header = this->m_RawHeader;
 
-  ScancoImageIO::PadString( header, this->m_Version, 16 ); header +=16;
+  ScancoImageIO::PadString( header, this->m_Version, 16 ); header += 16;
   // 3 -> ISQ data type
   ScancoImageIO::EncodeInt( 3, header ); header += 4;
   const SizeValueType numberOfBytes = static_cast< SizeValueType >( this->GetImageSizeInBytes() );
@@ -1150,12 +1150,12 @@ ScancoImageIO
   for( unsigned int dimension = 0; dimension < 3; ++dimension )
     {
     // pixdim
-    ScancoImageIO::EncodeInt( this->GetDimensions( dimension ), header ); header +=4;
+    ScancoImageIO::EncodeInt( this->GetDimensions( dimension ), header ); header += 4;
     }
   for( unsigned int dimension = 0; dimension < 3; ++dimension )
     {
     // physdim
-    ScancoImageIO::EncodeInt( this->GetSpacing( dimension ) * this->GetDimensions( dimension ) * 1e3 , header ); header +=4;
+    ScancoImageIO::EncodeInt( this->GetSpacing( dimension ) * this->GetDimensions( dimension ) * 1e3, header ); header += 4;
     }
   ScancoImageIO::EncodeInt( (int)(this->m_SliceThickness * 1e3 ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_SliceIncrement * 1e3 ), header ); header += 4;
@@ -1172,7 +1172,7 @@ ScancoImageIO
   ScancoImageIO::EncodeInt( (int)(this->m_Site), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_ReferenceLine * 1e3), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_ReconstructionAlg), header ); header += 4;
-  ScancoImageIO::PadString( header, this->m_PatientName, 40 ); header +=40;
+  ScancoImageIO::PadString( header, this->m_PatientName, 40 ); header += 40;
   ScancoImageIO::EncodeInt( (int)(this->m_Energy * 1e3 ), header ); header += 4;
   ScancoImageIO::EncodeInt( (int)(this->m_Intensity * 1e3 ), header ); header += 4;
   const std::size_t fillSize = 83 * 4;
