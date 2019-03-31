@@ -58,7 +58,7 @@ public:
 
 protected:
   ScancoImageIOFactory();
-  ~ScancoImageIOFactory();
+  ~ScancoImageIOFactory() override = default;
 
 private:
   ITK_DISALLOW_COPY_AND_ASSIGN(ScancoImageIOFactory);
