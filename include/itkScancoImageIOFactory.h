@@ -40,9 +40,9 @@ public:
   using ConstPointer = SmartPointer< const Self >;
 
   /** Class methods used to interface with the registered factories. */
-  virtual const char * GetITKSourceVersion() const ITK_OVERRIDE;
+  virtual const char * GetITKSourceVersion() const override;
 
-  virtual const char * GetDescription() const ITK_OVERRIDE;
+  virtual const char * GetDescription() const override;
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
