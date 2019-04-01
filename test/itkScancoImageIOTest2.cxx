@@ -38,14 +38,14 @@ int itkScancoImageIOTest2(int argc, char* argv[])
   // ATTENTION THIS IS THE PIXEL TYPE FOR
   // THE RESULTING IMAGE
   constexpr unsigned int Dimension = 3;
-  typedef short                              PixelType;
-  typedef itk::Image< PixelType, Dimension > ImageType;
+  using PixelType = short;
+  using ImageType = itk::Image< PixelType, Dimension >;
 
-  typedef itk::ImageFileReader< ImageType > ReaderType;
+  using ReaderType = itk::ImageFileReader< ImageType >;
   ReaderType::Pointer reader = ReaderType::New();
 
   // force use of ScancoIO
-  typedef itk::ScancoImageIO IOType;
+  using IOType = itk::ScancoImageIO;
   IOType::Pointer scancoIO = IOType::New();
   reader->SetImageIO( scancoIO );
 
@@ -96,7 +96,7 @@ int itkScancoImageIOTest2(int argc, char* argv[])
   TEST_EXPECT_TRUE( itk::Math::FloatAlmostEqual( scancoIO->GetIntensity(), 0.177, 6, 1e-3 ) );
 
   // Generate test image
-  typedef itk::ImageFileWriter< ImageType > WriterType;
+  using WriterType = itk::ImageFileWriter< ImageType >;
   WriterType::Pointer writer = WriterType::New();
   if( argc > 3 )
     {
