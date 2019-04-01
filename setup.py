@@ -13,7 +13,7 @@ except ImportError:
 
 setup(
     name='itk-ioscanco',
-    version='0.1.0',
+    version='0.1.1',
     author='Matt McCormick',
     author_email='matt.mccormick@kitware.com',
     packages=['itk'],
