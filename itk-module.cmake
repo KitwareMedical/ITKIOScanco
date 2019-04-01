@@ -15,6 +15,8 @@ itk_module(IOScanco
     ITKIOImageBase
   TEST_DEPENDS
     ITKTestKernel
+  FACTORY_NAMES
+    ImageIO::Scanco
   DESCRIPTION
     "${DOCUMENTATION}"
 )
