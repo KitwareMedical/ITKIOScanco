@@ -340,8 +340,10 @@ ScancoImageIO
   char *h = this->m_RawHeader;
   ScancoImageIO::StripString(this->m_Version, h, 16); h += 16;
   int dataType = ScancoImageIO::DecodeInt(h); h += 4;
-  int numBytes = ScancoImageIO::DecodeInt(h); h += 4;
-  int numBlocks = ScancoImageIO::DecodeInt(h); h += 4;
+  const int numBytes = ScancoImageIO::DecodeInt(h); h += 4;
+  (void) numBytes;
+  const int numBlocks = ScancoImageIO::DecodeInt(h); h += 4;
+  (void) numBlocks;
   this->m_PatientIndex = ScancoImageIO::DecodeInt(h); h += 4;
   this->m_ScannerID = ScancoImageIO::DecodeInt(h); h += 4;
   int year, month, day, hour, minute, second, milli;
