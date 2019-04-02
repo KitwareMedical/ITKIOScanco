@@ -1,3 +1,5 @@
+tqdm
+requests
 ipywidgets>=7.1.2
 itk>=5.0rc1
 itk-ioscanco
