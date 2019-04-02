@@ -25,6 +25,16 @@ available for Linux, macOS, and Windows. They can be installed with::
   python -m pip install --upgrade pip
   python -m pip install itk-ioscanco
 
+C++
+```
+
+Build the module as a separate project against an ITK build tree::
+
+  git clone https://github.com/KitwareMedical/ITKIOScanco
+  mkdir ITKIOScanco-bulid
+  cd ITKIOScanco-build
+  cmake -DITK_DIR=/your/path/to/ITK-build ../ITKIOScanco
+  cmake --build .
 
 License
 -------
