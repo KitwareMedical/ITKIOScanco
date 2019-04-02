@@ -5,6 +5,14 @@ ITKIOScanco
     :target: https://dev.azure.com/itkioscanco/ITKIOScanco/_build/latest?definitionId=1&branchName=master
     :alt:    Build Status
 
+.. image:: https://img.shields.io/pypi/v/itk-ioscanco.svg
+    :target: https://pypi.python.org/pypi/itk-ioscanco
+    :alt: PyPI Version
+
+.. image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
+    :target: https://github.com/KitwareMedical/ITKIOScanco/blob/master/LICENSE)
+    :alt: License
+
 Overview
 --------
 
@@ -31,7 +39,7 @@ C++
 Build the module as a separate project against an ITK build tree::
 
   git clone https://github.com/KitwareMedical/ITKIOScanco
-  mkdir ITKIOScanco-bulid
+  mkdir ITKIOScanco-build
   cd ITKIOScanco-build
   cmake -DITK_DIR=/your/path/to/ITK-build ../ITKIOScanco
   cmake --build .
