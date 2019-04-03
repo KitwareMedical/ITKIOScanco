@@ -47,6 +47,12 @@ Build the module as a separate project against an ITK build tree::
   cmake -DITK_DIR=/your/path/to/ITK-build ../ITKIOScanco
   cmake --build .
 
+Alternatively, since ITK 5.0, the module can be built by enabling the option::
+
+  Module_IOScanco:BOOL=ON
+
+in ITK's CMake configuration.
+
 License
 -------
 
