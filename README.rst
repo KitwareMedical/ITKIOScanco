@@ -23,6 +23,8 @@ An `ITK <https://www.itk.org/>`_ module to read and write Scanco microCT .isq fi
 
 ITK is an open-source, cross-platform library that provides developers with an extensive suite of software tools for image analysis. Developed through extreme programming methodologies, ITK employs leading-edge algorithms for registering and segmenting multidimensional scientific images.
 
+.. image:: https://media.giphy.com/media/W1UCXb57bzGZDOi4kr/giphy.gif
+  :alt: ITKIOScano Notebook
 
 Installation
 ------------
@@ -46,6 +48,12 @@ Build the module as a separate project against an ITK build tree::
   cd ITKIOScanco-build
   cmake -DITK_DIR=/your/path/to/ITK-build ../ITKIOScanco
   cmake --build .
+
+Alternatively, since ITK 5.0, the module can be built by enabling the option::
+
+  Module_IOScanco:BOOL=ON
+
+in ITK's CMake configuration.
 
 License
 -------
