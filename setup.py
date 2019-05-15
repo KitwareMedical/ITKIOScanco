@@ -13,7 +13,7 @@ except ImportError:
 
 setup(
     name='itk-ioscanco',
-    version='0.2.0',
+    version='0.3.0',
     author='Matt McCormick',
     author_email='matt.mccormick@kitware.com',
     packages=['itk'],
@@ -44,6 +44,6 @@ setup(
     keywords='ITK InsightToolkit',
     url=r'https://itk.org/',
     install_requires=[
-        r'itk>=5.0rc1'
+        r'itk>=5.0rc2'
     ]
     )
