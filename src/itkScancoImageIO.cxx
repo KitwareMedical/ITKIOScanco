@@ -1152,7 +1152,7 @@ ScancoImageIO ::CanWriteFile(const char * name)
 {
   const std::string filename = name;
 
-  if (filename == "")
+  if (filename.empty())
   {
     return false;
   }
