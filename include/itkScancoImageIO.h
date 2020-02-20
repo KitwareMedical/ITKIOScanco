@@ -66,7 +66,7 @@ namespace itk
  * \ingroup IOFilters
  * \ingroup IOScanco
  */
-class IOScanco_EXPORT ScancoImageIO: public ImageIOBase
+class IOScanco_EXPORT ScancoImageIO : public ImageIOBase
 {
 public:
   ITK_DISALLOW_COPY_AND_ASSIGN(ScancoImageIO);
@@ -74,8 +74,8 @@ public:
   /** Standard class typedefs. */
   using Self = ScancoImageIO;
   using Superclass = ImageIOBase;
-  using Pointer = SmartPointer< Self >;
-  using ConstPointer = SmartPointer< const Self >;
+  using Pointer = SmartPointer<Self>;
+  using ConstPointer = SmartPointer<const Self>;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -88,12 +88,13 @@ public:
    * while others can support 2D, 3D, or even n-D. This method returns
    * true/false as to whether the ImageIO can support the dimension
    * indicated. */
-  virtual bool SupportsDimension(unsigned long dimension) override
+  virtual bool
+  SupportsDimension(unsigned long dimension) override
   {
-    if( dimension == 3 )
-      {
+    if (dimension == 3)
+    {
       return true;
-      }
+    }
     return false;
   }
 
@@ -101,162 +102,203 @@ public:
 
   /** Determine the file type. Returns true if this ImageIO can read the
    * file specified. */
-  virtual bool CanReadFile(const char *) override;
+  virtual bool
+  CanReadFile(const char *) override;
 
   /** Set the spacing and dimension information for the set filename. */
-  virtual void ReadImageInformation() override;
+  virtual void
+  ReadImageInformation() override;
 
   /** Reads the data from disk into the memory buffer provided. */
-  virtual void Read(void *buffer) override;
+  virtual void
+  Read(void * buffer) override;
 
   /*-------- This part of the interfaces deals with writing data. ----- */
 
   /** Determine the file type. Returns true if this ImageIO can write the
    * file specified. */
-  virtual bool CanWriteFile(const char *) override;
+  virtual bool
+  CanWriteFile(const char *) override;
 
   /** Set the spacing and dimension information for the set filename. */
-  virtual void WriteImageInformation() override;
+  virtual void
+  WriteImageInformation() override;
 
   /** Writes the data to disk from the memory buffer provided. Make sure
    * that the IORegions has been set properly. */
-  virtual void Write(const void *buffer) override;
+  virtual void
+  Write(const void * buffer) override;
 
 
-  virtual bool CanStreamRead() override
+  virtual bool
+  CanStreamRead() override
   {
     return false;
   }
 
-  virtual bool CanStreamWrite() override
+  virtual bool
+  CanStreamWrite() override
   {
     return false;
   }
 
   /** Get a string that states the version of the file header.
    * Max size: 16 characters. */
-  const char *GetVersion() const { return this->m_Version; }
-  void SetVersion( const char * version )
-    {
+  const char *
+  GetVersion() const
+  {
+    return this->m_Version;
+  }
+  void
+  SetVersion(const char * version)
+  {
     strcpy(this->m_Version, version);
     this->Modified();
-    }
+  }
 
-  itkGetConstMacro( PatientIndex, int );
-  itkSetMacro( PatientIndex, int );
+  itkGetConstMacro(PatientIndex, int);
+  itkSetMacro(PatientIndex, int);
 
-  itkGetConstMacro( ScannerID, int );
-  itkSetMacro( ScannerID, int );
+  itkGetConstMacro(ScannerID, int);
+  itkSetMacro(ScannerID, int);
 
-  itkGetConstMacro( SliceThickness, double );
-  itkSetMacro( SliceThickness, double );
+  itkGetConstMacro(SliceThickness, double);
+  itkSetMacro(SliceThickness, double);
 
-  itkGetConstMacro( SliceIncrement, double );
-  itkSetMacro( SliceIncrement, double );
+  itkGetConstMacro(SliceIncrement, double);
+  itkSetMacro(SliceIncrement, double);
 
-  itkGetConstMacro( StartPosition, double );
-  itkSetMacro( StartPosition, double );
+  itkGetConstMacro(StartPosition, double);
+  itkSetMacro(StartPosition, double);
 
   /** Set / Get the minimum and maximum values */
-  const double * GetDataRange() const { return this->m_DataRange; }
-  void SetDataRange( const double * dataRange )
-    {
+  const double *
+  GetDataRange() const
+  {
+    return this->m_DataRange;
+  }
+  void
+  SetDataRange(const double * dataRange)
+  {
     this->m_DataRange[0] = dataRange[0];
     this->m_DataRange[1] = dataRange[1];
-    }
+  }
 
-  itkGetConstMacro( MuScaling, double );
-  itkSetMacro( MuScaling, double );
+  itkGetConstMacro(MuScaling, double);
+  itkSetMacro(MuScaling, double);
 
-  itkGetConstMacro( NumberOfSamples, int );
-  itkSetMacro( NumberOfSamples, int );
+  itkGetConstMacro(NumberOfSamples, int);
+  itkSetMacro(NumberOfSamples, int);
 
-  itkGetConstMacro( NumberOfProjections, int );
-  itkSetMacro( NumberOfProjections, int );
+  itkGetConstMacro(NumberOfProjections, int);
+  itkSetMacro(NumberOfProjections, int);
 
-  itkGetConstMacro( ScanDistance, double );
-  itkSetMacro( ScanDistance, double );
+  itkGetConstMacro(ScanDistance, double);
+  itkSetMacro(ScanDistance, double);
 
-  itkGetConstMacro( ScannerType, int );
-  itkSetMacro( ScannerType, int );
+  itkGetConstMacro(ScannerType, int);
+  itkSetMacro(ScannerType, int);
 
-  itkGetConstMacro( SampleTime, double );
-  itkSetMacro( SampleTime, double );
+  itkGetConstMacro(SampleTime, double);
+  itkSetMacro(SampleTime, double);
 
-  itkGetConstMacro( MeasurementIndex, int );
-  itkSetMacro( MeasurementIndex, int );
+  itkGetConstMacro(MeasurementIndex, int);
+  itkSetMacro(MeasurementIndex, int);
 
-  itkGetConstMacro( Site, int );
-  itkSetMacro( Site, int );
+  itkGetConstMacro(Site, int);
+  itkSetMacro(Site, int);
 
-  itkGetConstMacro( ReferenceLine, int );
-  itkSetMacro( ReferenceLine, int );
+  itkGetConstMacro(ReferenceLine, int);
+  itkSetMacro(ReferenceLine, int);
 
-  itkGetConstMacro( ReconstructionAlg, int );
-  itkSetMacro( ReconstructionAlg, int );
+  itkGetConstMacro(ReconstructionAlg, int);
+  itkSetMacro(ReconstructionAlg, int);
 
   /** Get a string that states patient name.
    * Max size: 40 characters. */
-  const char *GetPatientName() const { return this->m_PatientName; }
-  void SetPatientName( const char * version )
-    {
+  const char *
+  GetPatientName() const
+  {
+    return this->m_PatientName;
+  }
+  void
+  SetPatientName(const char * version)
+  {
     strcpy(this->m_PatientName, version);
     this->Modified();
-    }
+  }
 
-  itkGetConstMacro( Energy, double );
-  itkSetMacro( Energy, double );
+  itkGetConstMacro(Energy, double);
+  itkSetMacro(Energy, double);
 
-  itkGetConstMacro( Intensity, double );
-  itkSetMacro( Intensity, double );
+  itkGetConstMacro(Intensity, double);
+  itkSetMacro(Intensity, double);
 
 protected:
   ScancoImageIO();
   ~ScancoImageIO();
 
-  virtual void PrintSelf(std::ostream & os, Indent indent) const override;
+  virtual void
+  PrintSelf(std::ostream & os, Indent indent) const override;
 
 private:
-
   /** Check the file header to see what type of file it is.
    *
    *  Return values are: 0 if unrecognized, 1 if ISQ/RAD,
    *  2 if AIM 020, 3 if AIM 030.
    */
-  int CheckVersion(const char header[16]);
+  int
+  CheckVersion(const char header[16]);
 
   /** Convert char data to 32-bit int (little-endian). */
-  static int DecodeInt(const void *data);
+  static int
+  DecodeInt(const void * data);
   /** Convert 32-bit int (little-endian) to char data. */
-  static void EncodeInt(int data, void * target);
+  static void
+  EncodeInt(int data, void * target);
 
   /** Convert char data to float (single precision). */
-  static float DecodeFloat(const void *data);
+  static float
+  DecodeFloat(const void * data);
 
   /** Convert char data to float (double precision). */
-  static double DecodeDouble(const void *data);
+  static double
+  DecodeDouble(const void * data);
 
   //! Convert a VMS timestamp to a calendar date.
-  void DecodeDate(const void *data,
-    int& year, int& month, int& day,
-    int& hour, int& minute, int& second, int& millis);
+  void
+  DecodeDate(const void * data,
+             int &        year,
+             int &        month,
+             int &        day,
+             int &        hour,
+             int &        minute,
+             int &        second,
+             int &        millis);
   //! Convert the current calendar date to a VMS timestamp and store in target
-  void EncodeDate(void * target);
+  void
+  EncodeDate(void * target);
 
   //! Strip a string by removing trailing whitespace.
   /*!
    *  The dest must have a size of at least l+1.
    */
-  static void StripString(char *dest, const char *source, size_t l);
-  static void PadString(char *dest, const char *source, size_t l);
+  static void
+  StripString(char * dest, const char * source, size_t l);
+  static void
+  PadString(char * dest, const char * source, size_t l);
 
-  void InitializeHeader();
+  void
+  InitializeHeader();
 
-  int ReadISQHeader(std::ifstream *file, unsigned long bytesRead);
+  int
+  ReadISQHeader(std::ifstream * file, unsigned long bytesRead);
 
-  int ReadAIMHeader(std::ifstream *file, unsigned long bytesRead);
+  int
+  ReadAIMHeader(std::ifstream * file, unsigned long bytesRead);
 
-  void WriteISQHeader(std::ofstream *file);
+  void
+  WriteISQHeader(std::ofstream * file);
 
   // Header information
   char   m_Version[18];

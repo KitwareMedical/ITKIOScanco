@@ -25,16 +25,16 @@
 
 #define SPECIFIC_IMAGEIO_MODULE_TEST
 
-int itkScancoImageIOTest(int argc, char* argv[])
+int
+itkScancoImageIOTest(int argc, char * argv[])
 {
-  if( argc < 3 )
-    {
+  if (argc < 3)
+  {
     std::cerr << "Missing parameters." << std::endl;
     std::cerr << "Usage: " << std::endl;
-    std::cerr << itkNameOfTestExecutableMacro(argv)
-      << " Input Output" << std::endl;
+    std::cerr << itkNameOfTestExecutableMacro(argv) << " Input Output" << std::endl;
     return EXIT_FAILURE;
-    }
+  }
   const char * inputFileName = argv[1];
   const char * outputFileName = argv[2];
 
@@ -42,56 +42,56 @@ int itkScancoImageIOTest(int argc, char* argv[])
   // THE RESULTING IMAGE
   constexpr unsigned int Dimension = 3;
   using PixelType = short;
-  using ImageType = itk::Image< PixelType, Dimension >;
+  using ImageType = itk::Image<PixelType, Dimension>;
 
-  using ReaderType = itk::ImageFileReader< ImageType >;
+  using ReaderType = itk::ImageFileReader<ImageType>;
   ReaderType::Pointer reader = ReaderType::New();
 
   // force use of ScancoIO
   using IOType = itk::ScancoImageIO;
   IOType::Pointer scancoIO = IOType::New();
 
-  ITK_EXERCISE_BASIC_OBJECT_METHODS( scancoIO, ScancoImageIO, ImageIOBase );
+  ITK_EXERCISE_BASIC_OBJECT_METHODS(scancoIO, ScancoImageIO, ImageIOBase);
 
 
-  reader->SetImageIO( scancoIO );
+  reader->SetImageIO(scancoIO);
 
   // check usability of dimension (for coverage)
-  if ( !scancoIO->SupportsDimension(3) )
-    {
+  if (!scancoIO->SupportsDimension(3))
+  {
     std::cerr << "Did not support dimension 3" << std::endl;
     return EXIT_FAILURE;
-    }
+  }
 
   // read the file
-  reader->SetFileName( inputFileName );
+  reader->SetFileName(inputFileName);
   try
-    {
+  {
     reader->Update();
-    }
-  catch ( itk::ExceptionObject & error )
-    {
+  }
+  catch (itk::ExceptionObject & error)
+  {
     std::cerr << "Exception in the file reader " << std::endl;
     std::cerr << error << std::endl;
-    if( argc == 3 ) // should fail
-      {
+    if (argc == 3) // should fail
+    {
       return EXIT_SUCCESS;
-      }
-    return EXIT_FAILURE;
     }
+    return EXIT_FAILURE;
+  }
 
   ImageType::Pointer image = reader->GetOutput();
-  image->Print(std::cout );
+  image->Print(std::cout);
 
   ImageType::RegionType region = image->GetLargestPossibleRegion();
   std::cout << "region " << region;
 
   // Generate test image
-  using WriterType = itk::ImageFileWriter< ImageType >;
+  using WriterType = itk::ImageFileWriter<ImageType>;
   WriterType::Pointer writer = WriterType::New();
-  writer->SetInput( reader->GetOutput() );
-  writer->SetFileName( outputFileName );
-  ITK_TRY_EXPECT_NO_EXCEPTION( writer->Update() );
+  writer->SetInput(reader->GetOutput());
+  writer->SetFileName(outputFileName);
+  ITK_TRY_EXPECT_NO_EXCEPTION(writer->Update());
 
 
   std::cout << "Test finished" << std::endl;
