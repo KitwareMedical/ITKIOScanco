@@ -28,7 +28,7 @@ namespace itk
  * \brief Create instances of ScancoImageIO objects using an object factory.
  * \ingroup ITKIOScanco
  */
-class IOScanco_EXPORT ScancoImageIOFactory: public ObjectFactoryBase
+class IOScanco_EXPORT ScancoImageIOFactory : public ObjectFactoryBase
 {
 public:
   ITK_DISALLOW_COPY_AND_ASSIGN(ScancoImageIOFactory);
@@ -36,13 +36,15 @@ public:
   /** Standard class typedefs. */
   using Self = ScancoImageIOFactory;
   using Superclass = ObjectFactoryBase;
-  using Pointer = SmartPointer< Self >;
-  using ConstPointer = SmartPointer< const Self >;
+  using Pointer = SmartPointer<Self>;
+  using ConstPointer = SmartPointer<const Self>;
 
   /** Class methods used to interface with the registered factories. */
-  virtual const char * GetITKSourceVersion() const override;
+  virtual const char *
+  GetITKSourceVersion() const override;
 
-  virtual const char * GetDescription() const override;
+  virtual const char *
+  GetDescription() const override;
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);
@@ -51,7 +53,8 @@ public:
   itkTypeMacro(ScancoImageIOFactory, ObjectFactoryBase);
 
   /** Register one factory of this type  */
-  static void RegisterOneFactory()
+  static void
+  RegisterOneFactory()
   {
     ScancoImageIOFactory::Pointer scancoFactory = ScancoImageIOFactory::New();
 
@@ -61,7 +64,6 @@ public:
 protected:
   ScancoImageIOFactory();
   ~ScancoImageIOFactory() override = default;
-
 };
 } // end namespace itk
 

@@ -23,11 +23,8 @@ namespace itk
 {
 ScancoImageIOFactory::ScancoImageIOFactory()
 {
-  this->RegisterOverride( "itkImageIOBase",
-                          "itkScancoImageIO",
-                          "Scanco Image IO",
-                          1,
-                          CreateObjectFunction< ScancoImageIO >::New() );
+  this->RegisterOverride(
+    "itkImageIOBase", "itkScancoImageIO", "Scanco Image IO", 1, CreateObjectFunction<ScancoImageIO>::New());
 }
 
 const char *
@@ -47,13 +44,14 @@ ScancoImageIOFactory::GetDescription() const
 
 static bool ScancoImageIOFactoryHasBeenRegistered;
 
-void IOScanco_EXPORT ScancoImageIOFactoryRegister__Private(void)
+void IOScanco_EXPORT
+     ScancoImageIOFactoryRegister__Private(void)
 {
-  if( ! ScancoImageIOFactoryHasBeenRegistered )
-    {
+  if (!ScancoImageIOFactoryHasBeenRegistered)
+  {
     ScancoImageIOFactoryHasBeenRegistered = true;
     ScancoImageIOFactory::RegisterOneFactory();
-    }
+  }
 }
 
 } // end namespace itk
