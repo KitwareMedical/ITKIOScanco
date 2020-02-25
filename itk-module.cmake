@@ -10,7 +10,6 @@ file(READ "${MY_CURRENT_DIR}/README.rst" DOCUMENTATION)
 
 # define the dependencies of the include module and the tests
 itk_module(IOScanco
-  ENABLE_SHARED
   PRIVATE_DEPENDS
     ITKIOImageBase
   TEST_DEPENDS
@@ -19,4 +18,6 @@ itk_module(IOScanco
     ImageIO::Scanco
   DESCRIPTION
     "${DOCUMENTATION}"
+  EXCLUDE_FROM_DEFAULT
+  ENABLE_SHARED
 )
