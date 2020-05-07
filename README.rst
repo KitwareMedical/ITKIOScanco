@@ -1,11 +1,7 @@
 ITKIOScanco
 ===========
 
-.. image:: https://github.com/InsightSoftwareConsortium/ITKIOScanco/workflows/Build,%20test,%20package/badge.svg
-
-.. image:: https://dev.azure.com/itkioscanco/ITKIOScanco/_apis/build/status/KitwareMedical.ITKIOScanco?branchName=master
-    :target: https://dev.azure.com/itkioscanco/ITKIOScanco/_build/latest?definitionId=1&branchName=master
-    :alt:    Build Status
+.. image:: https://github.com/KitwareMedical/ITKIOScanco/workflows/Build,%20test,%20package/badge.svg
 
 .. image:: https://img.shields.io/pypi/v/itk-ioscanco.svg
     :target: https://pypi.python.org/pypi/itk-ioscanco
