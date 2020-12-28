@@ -636,7 +636,7 @@ ScancoImageIO ::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
 
   // read the rest of the header
   headerSize += preheaderSize + structSize + logSize;
-  this->SetHeaderSize(headerSize);
+  this->m_HeaderSize = headerSize;
 
   if (headerSize > bytesRead)
   {
