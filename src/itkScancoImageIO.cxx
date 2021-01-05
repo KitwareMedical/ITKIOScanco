@@ -43,7 +43,7 @@
 namespace itk
 {
 
-ScancoImageIO ::ScancoImageIO()
+ScancoImageIO::ScancoImageIO()
 
 {
   this->m_FileType = IOFileEnum::Binary;
@@ -63,21 +63,21 @@ ScancoImageIO ::ScancoImageIO()
 }
 
 
-ScancoImageIO ::~ScancoImageIO()
+ScancoImageIO::~ScancoImageIO()
 {
   delete[] this->m_RawHeader;
 }
 
 
 void
-ScancoImageIO ::PrintSelf(std::ostream & os, Indent indent) const
+ScancoImageIO::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
 }
 
 
 int
-ScancoImageIO ::CheckVersion(const char header[16])
+ScancoImageIO::CheckVersion(const char header[16])
 {
   int fileType = 0;
 
@@ -104,7 +104,7 @@ ScancoImageIO ::CheckVersion(const char header[16])
 
 
 int
-ScancoImageIO ::DecodeInt(const void * data)
+ScancoImageIO::DecodeInt(const void * data)
 {
   const auto * cp = static_cast<const unsigned char *>(data);
   return (cp[0] | (cp[1] << 8) | (cp[2] << 16) | (cp[3] << 24));
@@ -112,7 +112,7 @@ ScancoImageIO ::DecodeInt(const void * data)
 
 
 void
-ScancoImageIO ::EncodeInt(int data, void * target)
+ScancoImageIO::EncodeInt(int data, void * target)
 {
   auto * targetAsUnsignedChar = static_cast<unsigned char *>(target);
   targetAsUnsignedChar[0] = (unsigned char)(data);
@@ -123,7 +123,7 @@ ScancoImageIO ::EncodeInt(int data, void * target)
 
 
 float
-ScancoImageIO ::DecodeFloat(const void * data)
+ScancoImageIO::DecodeFloat(const void * data)
 {
   const auto * cp = static_cast<const unsigned char *>(data);
   // different ordering and exponent bias than IEEE 754 float
@@ -138,7 +138,7 @@ ScancoImageIO ::DecodeFloat(const void * data)
 
 
 double
-ScancoImageIO ::DecodeDouble(const void * data)
+ScancoImageIO::DecodeDouble(const void * data)
 {
   // different ordering and exponent bias than IEEE 754 double
   const auto * cp = static_cast<const unsigned char *>(data);
@@ -156,14 +156,14 @@ ScancoImageIO ::DecodeDouble(const void * data)
 
 
 void
-ScancoImageIO ::DecodeDate(const void * data,
-                           int &        year,
-                           int &        month,
-                           int &        day,
-                           int &        hour,
-                           int &        minute,
-                           int &        second,
-                           int &        millis)
+ScancoImageIO::DecodeDate(const void * data,
+                          int &        year,
+                          int &        month,
+                          int &        day,
+                          int &        hour,
+                          int &        minute,
+                          int &        second,
+                          int &        millis)
 {
   // This is the offset between the astronomical "Julian day", which counts
   // days since January 1, 4713BC, and the "VMS epoch", which counts from
@@ -213,7 +213,7 @@ ScancoImageIO ::DecodeDate(const void * data,
 
 
 void
-ScancoImageIO ::EncodeDate(void * target)
+ScancoImageIO::EncodeDate(void * target)
 {
   time_t currentTimeUnix;
   std::time(&currentTimeUnix);
@@ -227,7 +227,7 @@ ScancoImageIO ::EncodeDate(void * target)
 
 
 bool
-ScancoImageIO ::CanReadFile(const char * filename)
+ScancoImageIO::CanReadFile(const char * filename)
 {
   std::ifstream infile;
   this->OpenFileForReading(infile, filename);
@@ -252,7 +252,7 @@ ScancoImageIO ::CanReadFile(const char * filename)
 
 
 void
-ScancoImageIO ::InitializeHeader()
+ScancoImageIO::InitializeHeader()
 {
   memset(this->m_Version, 0, 18);
   memset(this->m_PatientName, 0, 42);
@@ -298,7 +298,7 @@ ScancoImageIO ::InitializeHeader()
 
 
 void
-ScancoImageIO ::StripString(char * dest, const char * source, size_t length)
+ScancoImageIO::StripString(char * dest, const char * source, size_t length)
 {
   char * dp = dest;
   for (size_t i = 0; i < length && *source != '\0'; ++i)
@@ -314,7 +314,7 @@ ScancoImageIO ::StripString(char * dest, const char * source, size_t length)
 
 
 void
-ScancoImageIO ::PadString(char * dest, const char * source, size_t length)
+ScancoImageIO::PadString(char * dest, const char * source, size_t length)
 {
   for (size_t i = 0; i < length && *source != '\0'; ++i)
   {
@@ -328,7 +328,7 @@ ScancoImageIO ::PadString(char * dest, const char * source, size_t length)
 
 
 int
-ScancoImageIO ::ReadISQHeader(std::ifstream * file, unsigned long bytesRead)
+ScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned long bytesRead)
 {
   if (bytesRead < 512)
   {
@@ -594,7 +594,7 @@ ScancoImageIO ::ReadISQHeader(std::ifstream * file, unsigned long bytesRead)
 
 
 int
-ScancoImageIO ::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
+ScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
 {
   if (bytesRead < 160)
   {
@@ -972,7 +972,7 @@ ScancoImageIO ::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
 
 
 void
-ScancoImageIO ::ReadImageInformation()
+ScancoImageIO::ReadImageInformation()
 {
   this->InitializeHeader();
 
@@ -1025,7 +1025,7 @@ ScancoImageIO ::ReadImageInformation()
 
 
 void
-ScancoImageIO ::Read(void * buffer)
+ScancoImageIO::Read(void * buffer)
 {
   std::ifstream infile;
   this->OpenFileForReading(infile, this->m_FileName);
@@ -1192,7 +1192,7 @@ ScancoImageIO ::Read(void * buffer)
 
 
 bool
-ScancoImageIO ::CanWriteFile(const char * name)
+ScancoImageIO::CanWriteFile(const char * name)
 {
   const std::string filename = name;
 
@@ -1214,7 +1214,7 @@ ScancoImageIO ::CanWriteFile(const char * name)
 
 
 void
-ScancoImageIO ::WriteISQHeader(std::ofstream * file)
+ScancoImageIO::WriteISQHeader(std::ofstream * file)
 {
   delete[] this->m_RawHeader;
   this->m_RawHeader = new char[512];
@@ -1308,7 +1308,7 @@ ScancoImageIO ::WriteISQHeader(std::ofstream * file)
 
 
 void
-ScancoImageIO ::WriteImageInformation()
+ScancoImageIO::WriteImageInformation()
 {
   if (this->m_FileName.empty())
   {
@@ -1325,7 +1325,7 @@ ScancoImageIO ::WriteImageInformation()
 
 
 void
-ScancoImageIO ::Write(const void * buffer)
+ScancoImageIO::Write(const void * buffer)
 {
   this->WriteImageInformation();
 
