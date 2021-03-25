@@ -36,6 +36,7 @@ available for Linux, macOS, and Windows. They can be installed with::
   python -m pip install --upgrade pip
   python -m pip install itk-ioscanco
 
+
 C++
 ```
 
@@ -52,6 +53,16 @@ Alternatively, since ITK 5.0, the module can be built by enabling the option::
   Module_IOScanco:BOOL=ON
 
 in ITK's CMake configuration.
+
+Usage
+-----
+
+::
+
+  import itk
+
+  imageio = itk.ScancoImageIO.New()
+  image = itk.imread('myvolume.ISQ', imageio=imageio)
 
 License
 -------
