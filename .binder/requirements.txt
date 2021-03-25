@@ -2,3 +2,5 @@ tqdm
 requests
 itk-ioscanco>=0.9
 itkwidgets
+xarray
+zarr
