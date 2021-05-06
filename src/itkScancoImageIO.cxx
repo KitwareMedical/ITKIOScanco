@@ -1115,7 +1115,7 @@ ScancoImageIO::Read(void * buffer)
   if (this->m_Compression == 0)
   {
     infile.read(reinterpret_cast<char *>(buffer), outSize);
-    return;
+    size = outSize;
   }
   else if (this->m_Compression == 0x00b1)
   {
