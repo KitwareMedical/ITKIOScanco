@@ -90,8 +90,7 @@ itkScancoImageIOTest3(int argc, char * argv[])
   std::cout << "RescaleUnits: \t\t" << scancoIO->GetRescaleUnits() << std::endl;
   ITK_TEST_EXPECT_EQUAL(scancoIO->GetRescaleUnits(), std::string("mg HA/ccm"));
   std::cout << "CalibrationData: \t\t" << scancoIO->GetCalibrationData() << std::endl;
-  ITK_TEST_EXPECT_EQUAL(scancoIO->GetCalibrationData(), 
-                        std::string("68 kVp, BH: 200 mg HA/ccm, Scaling 8192, 0.2 CU"));
+  ITK_TEST_EXPECT_EQUAL(scancoIO->GetCalibrationData(), std::string("68 kVp, BH: 200 mg HA/ccm, Scaling 8192, 0.2 CU"));
   std::cout << "NumberOfSamples: \t" << scancoIO->GetNumberOfSamples() << std::endl;
   ITK_TEST_EXPECT_EQUAL(scancoIO->GetNumberOfSamples(), 2304);
   std::cout << "NumberOfProjections: " << scancoIO->GetNumberOfProjections() << std::endl;
