@@ -122,7 +122,8 @@ itkScancoImageIOTest2(int argc, char * argv[])
   itk::ExposeMetaData<std::string>(metaData, "RescaleUnits", stringMeta);
   ITK_TEST_EXPECT_EQUAL(stringMeta, std::string("mg HA/ccm"));
   std::cout << "CalibrationData: \t\t" << scancoIO->GetCalibrationData() << std::endl;
-  ITK_TEST_EXPECT_EQUAL(scancoIO->GetCalibrationData(), std::string("45 kVp, 0.5mm Al, BH: 1200mg HA/ccm, Scaling 4096"));
+  ITK_TEST_EXPECT_EQUAL(scancoIO->GetCalibrationData(),
+                        std::string("45 kVp, 0.5mm Al, BH: 1200mg HA/ccm, Scaling 4096"));
   itk::ExposeMetaData<std::string>(metaData, "CalibrationData", stringMeta);
   ITK_TEST_EXPECT_EQUAL(stringMeta, std::string("45 kVp, 0.5mm Al, BH: 1200mg HA/ccm, Scaling 4096"));
   std::cout << "NumberOfSamples: \t" << scancoIO->GetNumberOfSamples() << std::endl;
