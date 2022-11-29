@@ -61,8 +61,7 @@ Usage
 
   import itk
 
-  imageio = itk.ScancoImageIO.New()
-  image = itk.imread('myvolume.ISQ', imageio=imageio)
+  image = itk.imread('myvolume.ISQ')
 
 License
 -------
