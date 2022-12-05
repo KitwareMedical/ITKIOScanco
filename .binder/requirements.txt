@@ -1,6 +1,6 @@
 tqdm
 requests
-itk-ioscanco>=0.9.1
+itk-ioscanco>=0.10.0
 itkwidgets
 xarray
 zarr
