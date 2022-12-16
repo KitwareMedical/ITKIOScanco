@@ -1,6 +1,6 @@
 tqdm
-requests
+pooch
 itk-ioscanco>=0.10.0
-itkwidgets
+itkwidgets[all]>=1.0a21
 xarray
 zarr
