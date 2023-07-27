@@ -25,6 +25,8 @@ Overview
 
 An `ITK <https://www.itk.org/>`_ module to read and write Scanco microCT .isq files.
 
+This package is a resource created by `Kitware <https://www.kitware.com>`_ et. al. for the community for `Open and Reproducible Musculoskeletal Imaging Research (ORMIR) <https://ormircommunity.github.io/packages.html>`_.
+
 ITK is an open-source, cross-platform library that provides developers with an extensive suite of software tools for image analysis. Developed through extreme programming methodologies, ITK employs leading-edge algorithms for registering and segmenting multidimensional scientific images.
 
 .. image:: https://media.giphy.com/media/W1UCXb57bzGZDOi4kr/giphy.gif
