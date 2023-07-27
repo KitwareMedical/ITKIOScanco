@@ -5,10 +5,10 @@ export default async function conversionLoadSampleInputs (model) {
 
   const inputVolumeElement = document.querySelector("#conversionInputs sl-input[name=input-volume]")
 
-  const response = await fetch('/sample-data/AIMIOTestImage.AIM')
-  const contentLength = +response.headers.get('Content-Length');
+  const url = import.meta.env.DEV ? '/sample-data/AIMIOTestImage.AIM' : 'https://itk.mypinata.cloud/ipfs/QmPaZBXqb99fsKQi28tCuGpW1LgiVrBYKRimY28nA9mYgE'
+  const response = await fetch(url)
+  const contentLength = parseInt(response.headers.get('Content-Length'))
   inputVolumeElement.helpText = 'Input volume size: ' + contentLength + ' bytes'
-  progressBar.max = contentLength
 
   const reader = response.body.getReader()
 
@@ -23,8 +23,9 @@ export default async function conversionLoadSampleInputs (model) {
 
     chunks.push(value)
     receivedLength += value.length
-    progressBar.value = receivedLength
-    progressBar.textContent = `${receivedLength.toString()} / ${contentLength.toString()} bytes`
+    const percent = receivedLength / contentLength * 100
+    progressBar.value = percent
+    progressBar.textContent = `${percent.toFixed(2)}%`
   }
 
   let inputVolume = new Uint8Array(receivedLength)

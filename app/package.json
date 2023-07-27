@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "description": "Convert and calibrate Scanco microCT volume .isq and .aim files.",
   "scripts": {
-    "start": "npm run copyShoelaceAssets && npm run downloadSampleData && vite -c vite.config.js",
+    "start": "pnpm copyShoelaceAssets && pnpm downloadSampleData && vite",
+    "preview": "pnpm copyShoelaceAssets && pnpm downloadSampleData && vite build && vite preview",
     "test": "echo \"tests are not configured\" && exit 1",
     "downloadSampleData": "dam download -v public/sample-data public/sample-data.tar.gz bafybeiepwh5ppaeaja7q6kqc25tvzfpkygqomxzqq4csnjfntoxarqtdiq https://w3s.link/ipfs/bafybeihiuinvftya2jqrr7fhdrdf4a5zhx7gnmawwf45mid7j2s5zcn6xi",
     "copyShoelaceAssets": "shx mkdir -p public/shoelace && shx cp -r node_modules/@shoelace-style/shoelace/dist/assets public/",
-    "build": "npm run copyShoelaceAssets && npm run downloadSampleData && vite -c vite.config.js build"
+    "build": "pnpm copyShoelaceAssets && pnpm downloadSampleData && vite build"
   },
   "keywords": [
     "itk",
