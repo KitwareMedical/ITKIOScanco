@@ -71,8 +71,8 @@ class ConversionController  {
     outputOutputDownload.addEventListener('click', (event) => {
         event.preventDefault()
         event.stopPropagation()
-        if (model.outputs.has("output")) {
-            globalThis.downloadFile(model.outputs.get("output"), "output.bin")
+        if (model.outputVolume) {
+            globalThis.downloadFile(model.outputVolume, `${model.inputFileName}.${model.outputFormat}`)
         }
     })
 
@@ -92,7 +92,7 @@ class ConversionController  {
         const t0 = performance.now()
 
         const { webWorker, image } = await readImageArrayBuffer(this.webWorker,
-          model.inputVolume,
+          model.inputVolume.slice(),
           'volume.aim'
         )
         this.webWorker = webWorker
