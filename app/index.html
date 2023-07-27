@@ -21,6 +21,10 @@
   import '@shoelace-style/shoelace/dist/components/alert/alert.js';
   import '@shoelace-style/shoelace/dist/components/icon/icon.js';
   import '@shoelace-style/shoelace/dist/components/divider/divider.js';
+  import '@shoelace-style/shoelace/dist/components/tag/tag.js';
+  import '@shoelace-style/shoelace/dist/components/popup/popup.js';
+  import '@shoelace-style/shoelace/dist/components/option/option.js';
+  import '@shoelace-style/shoelace/dist/components/select/select.js';
 
   import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path';
   setBasePath('/');
@@ -50,23 +54,27 @@
   <br /><br />
 
   <sl-tab-group>
-    <sl-tab slot="nav" panel="compressStringify-panel">compressStringify</sl-tab>
-    <sl-tab slot="nav" panel="parseStringDecompress-panel">parseStringDecompress</sl-tab>
+    <sl-tab slot="nav" panel="conversion-panel">Volume format conversion</sl-tab>
+    <sl-tab slot="nav" panel="calibration-panel" disabled>Volume calibration</sl-tab>
 
 
-    <sl-tab-panel name="compressStringify-panel">
+    <sl-tab-panel name="conversion-panel">
 
-    <small><i>Given a binary, compress and optionally base64 encode.</i></small><br /><br />
+    <small><i>Convert Scanco .AIM or .ISQ volumes to an open standard file format.</i></small><br /><br />
 
-    <div id="compressStringifyInputs"><form action="">
-      <sl-input required name="input" type="text" label="input" help-text="Input binary" disabled></sl-input>
-      <label for="input-file"><sl-button required variant="primary" outline onclick="this.parentElement.nextElementSibling.click()">Upload</sl-button></label><input type="file" name="input-file" style="display: none"/>
-<br /><br />
-      <sl-checkbox name="stringify">stringify - <i>Stringify the output</i></sl-checkbox>
-<br /><br />
-      <sl-input name="compression-level" type="number" value="3" label="compressionLevel" help-text="Compression level, typically 1-9"></sl-input>
-<br />
-      <sl-input name="data-url-prefix" type="text" label="dataUrlPrefix" help-text="dataURL prefix"></sl-input>
+    <div id="conversionInputs"><form action="">
+      <sl-input required name="input-volume" type="text" label="AIM or ISQ volume" help-text="Input volume" disabled></sl-input>
+      <label for="input-volume-file"><sl-button required variant="primary" outline onclick="this.parentElement.nextElementSibling.click()">Upload</sl-button></label><input type="file" name="input-volume-file" style="display: none"/>
+      <br />
+      <br />
+      <sl-select pill filled value="mha" required name="output-format" label="Output format" help-text="Output file format">
+        <sl-option value="mha">MetaImage</sl-option>
+        <sl-option value="nii.gz">NIfTI</sl-option>
+        <sl-option value="nrrd">NRRD</sl-option>
+        <sl-option value="vtk">VTK</sl-option>
+        <sl-option value="hdf5">ITK HDF5</sl-option>
+      </sl-select>
+      <br />
     <sl-divider></sl-divider>
       <br /><sl-button name="loadSampleInputs" variant="default" style="display: none;">Load sample inputs</sl-button>
       <sl-button type="button" variant="success" name="run">Run</sl-button><br /><br />
