@@ -1,0 +1,38 @@
+{
+  "name": "itk-io-scanco-app",
+  "version": "0.1.0",
+  "description": "Convert and calibrate Scanco microCT volume .isq and .aim files.",
+  "scripts": {
+    "start": "npm run copyShoelaceAssets && vite -c vite.config.js",
+    "test": "echo \"tests are not configured\" && exit 1",
+    "copyShoelaceAssets": "shx mkdir -p public/shoelace && shx cp -r node_modules/@shoelace-style/shoelace/dist/assets public/",
+    "build": "npm run copyShoelaceAssets && vite -c vite.config.js build"
+  },
+  "keywords": [
+    "itk",
+    "wasm",
+    "scanco",
+    "isq",
+    "aim",
+    "webassembly",
+    "wasi"
+  ],
+  "author": "Matt McCormick <matt.mccormick@kitware.com>",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/KitwareMedical/ITKIOScanco#readme",
+  "dependencies": {
+    "itk-image-io": "1.0.0-b.119",
+    "itk-wasm": "1.0.0-b.119"
+  },
+  "devDependencies": {
+    "@shoelace-style/shoelace": "^2.5.2",
+    "@types/node": "^20.2.5",
+    "shx": "^0.3.4",
+    "vite": "^4.3.3",
+    "vite-plugin-static-copy": "^0.14.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KitwareMedical/ITKIOScanco"
+  }
+}
