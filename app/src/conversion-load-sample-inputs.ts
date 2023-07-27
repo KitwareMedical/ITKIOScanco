@@ -34,9 +34,8 @@ export default async function conversionLoadSampleInputs (model) {
     position += chunk.length;
   }
 
-  // const sampleInput = new Uint8Array([222, 173, 190, 239])
-  // context.inputs.set("input", sampleInput)
   model.inputVolume = inputVolume
+  model.inputFileName = 'ITKIOScancoSampleVolume.aim'
   inputVolumeElement.value = inputVolume.subarray(0, 50).toString() + ' ...'
   progressBar.setAttribute('style', 'display: none;')
   progressBar.textContent = ''
