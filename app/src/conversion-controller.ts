@@ -1,6 +1,7 @@
 import { readImageArrayBuffer, writeImageArrayBuffer } from "itk-wasm"
 
 import conversionLoadSampleInputs from "./conversion-load-sample-inputs.js"
+import { notify, downloadFile } from "./utilities.js"
 
 class ConversionModel {
 
@@ -72,7 +73,7 @@ class ConversionController  {
         event.preventDefault()
         event.stopPropagation()
         if (model.outputVolume) {
-            globalThis.downloadFile(model.outputVolume, `${model.inputFileName}.${model.outputFormat}`)
+            downloadFile(model.outputVolume, `${model.inputFileName}.${model.outputFormat}`)
         }
     })
 
@@ -82,7 +83,7 @@ class ConversionController  {
       event.stopPropagation()
 
       if(!model.inputVolume) {
-        globalThis.notify("Required input volume not provided", "Please provide an AIM or ISQ file", "danger", "exclamation-octagon")
+        notify("Required input volume not provided", "Please provide an AIM or ISQ file", "danger", "exclamation-octagon")
         return
       }
 
@@ -96,13 +97,12 @@ class ConversionController  {
           'volume.aim'
         )
         this.webWorker = webWorker
-        console.log(image)
         // Avoid later use of detached buffer
         const direction = image.direction.slice()
         const { arrayBuffer } = await writeImageArrayBuffer(webWorker, image, `${model.inputFileName}.${model.outputFormat}`)
 
         const t1 = performance.now()
-        globalThis.notify("conversion successfully completed", `in ${t1 - t0} milliseconds.`, "success", "rocket-fill")
+        notify("conversion successfully completed", `in ${t1 - t0} milliseconds.`, "success", "rocket-fill")
 
         model.outputVolume = new Uint8Array(arrayBuffer)
 
@@ -119,7 +119,7 @@ class ConversionController  {
         image.data = "[...]"
         outputOutput.value = JSON.stringify(image, replacer, 2)
       } catch (error) {
-        globalThis.notify("Error while running pipeline", error.toString(), "danger", "exclamation-octagon")
+        notify("Error while running pipeline", error.toString(), "danger", "exclamation-octagon")
         throw error
       } finally {
         runButton.loading = false

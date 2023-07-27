@@ -1,4 +1,4 @@
-function downloadFile(content, filename) {
+export function downloadFile(content, filename) {
   const url = URL.createObjectURL(new Blob([content]))
   const a = document.createElement('a')
   a.href = url
@@ -23,7 +23,7 @@ function escapeHtml(html) {
   return escaped
 }
 
-function notify(title, message, variant = 'primary', icon = 'info-circle', duration = 3000) {
+export function notify(title, message, variant = 'primary', icon = 'info-circle', duration = 3000) {
   const slAlert = Object.assign(document.createElement('sl-alert'), {
     variant,
     closable: true,
@@ -39,7 +39,7 @@ function notify(title, message, variant = 'primary', icon = 'info-circle', durat
   setTimeout(() => slAlert.toast(), 300)
 }
 
-function disableInputs(inputId) {
+export function disableInputs(inputId) {
   document.querySelectorAll(`#${inputId} sl-button`).forEach(button => {
     button.disabled = true
   })
@@ -52,7 +52,7 @@ function disableInputs(inputId) {
   })
 }
 
-function enableInputs(inputId) {
+export function enableInputs(inputId) {
   document.querySelectorAll(`#${inputId} sl-button`).forEach(button => {
     button.disabled = false
   })

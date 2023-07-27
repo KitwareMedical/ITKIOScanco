@@ -13,10 +13,10 @@ export default defineConfig({
     // put lazy loaded JavaScript and Wasm bundles in dist directory
     viteStaticCopy({
       targets: [
-        { src: 'node_modules/itk-wasm/dist/web-workers/*', dest: 'dist/itk/web-workers' },
+        { src: 'node_modules/itk-wasm/dist/web-workers/*', dest: 'itk/web-workers' },
         {
           src: 'node_modules/itk-image-io/*',
-          dest: 'dist/itk/image-io',
+          dest: 'itk/image-io',
         },
       ],
     })
