@@ -3,12 +3,12 @@ export default async function conversionLoadSampleInputs (model) {
   progressBar.value = 0
   progressBar.setAttribute('style', 'display: block;')
 
-  const inputVolumeElement = document.querySelector("#conversionInputs sl-input[name=input-volume]")
+  const inputVolumeDescription = document.getElementById("input-volume-description")
 
   const url = import.meta.env.DEV ? '/sample-data/AIMIOTestImage.AIM' : 'https://itk.mypinata.cloud/ipfs/QmPaZBXqb99fsKQi28tCuGpW1LgiVrBYKRimY28nA9mYgE'
   const response = await fetch(url)
   const contentLength = parseInt(response.headers.get('Content-Length'))
-  inputVolumeElement.helpText = 'Input volume size: ' + contentLength + ' bytes'
+  inputVolumeDescription.innerHTML = `Sample AIM volume size: <sl-format-bytes value="${contentLength}"></sl-format-bytes>`
 
   const reader = response.body.getReader()
 
@@ -37,7 +37,6 @@ export default async function conversionLoadSampleInputs (model) {
 
   model.inputVolume = inputVolume
   model.inputFileName = 'ITKIOScancoSampleVolume.aim'
-  inputVolumeElement.value = inputVolume.subarray(0, 50).toString() + ' ...'
   progressBar.setAttribute('style', 'display: none;')
   progressBar.textContent = ''
   progressBar.max = 100

@@ -25,6 +25,8 @@
   import '@shoelace-style/shoelace/dist/components/select/select.js';
   import '@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js';
   import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
+  import '@shoelace-style/shoelace/dist/components/format-bytes/format-bytes.js';
+  import '@shoelace-style/shoelace/dist/components/details/details.js';
 
   import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path';
   setBasePath('/');
@@ -61,11 +63,11 @@
     <small><i>Convert Scanco .AIM or .ISQ volumes to an open standard file format.</i></small><br /><br />
 
     <div id="conversionInputs"><form action="">
-      <sl-input required name="input-volume" type="text" label="AIM or ISQ volume" help-text="Input volume" disabled></sl-input>
-      <label for="input-volume-file"><sl-button required variant="primary" outline onclick="this.parentElement.nextElementSibling.click()">Upload</sl-button></label><input type="file" name="input-volume-file" style="display: none"/>
+      <label for="input-volume-file"><sl-button required variant="primary" outline onclick="this.parentElement.nextElementSibling.click()"><sl-icon slot="prefix" name="box-arrow-up"></sl-icon> Upload</sl-button></label><input type="file" name="input-volume-file" style="display: none"/>
       <br />
+      <div id="input-volume-description"></div>
       <br />
-      <sl-select pill filled value="mha" required name="output-format" label="Output format" help-text="Output file format">
+      <sl-select filled value="mha" required name="output-format" label="Output format" help-text="Output file format">
         <sl-option value="mha">MetaImage</sl-option>
         <sl-option value="nii.gz">NIfTI</sl-option>
         <sl-option value="nrrd">NRRD</sl-option>
@@ -74,7 +76,7 @@
       </sl-select>
       <br />
     <sl-divider></sl-divider>
-    <br /><sl-tooltip content="Load example input data. This will overwrite any existing input data."><sl-button name="loadSampleInputs" variant="default" style="display: none;">Load sample</sl-button></sl-tooltip>
+    <br /><sl-tooltip content="Load example input data. This will overwrite data any existing input data."><sl-button name="loadSampleInputs" variant="default" style="display: none;">Load sample</sl-button></sl-tooltip>
     <sl-button type="button" variant="success" name="run">Convert</sl-button>
     <br />
     <br />
@@ -83,8 +85,8 @@
     <sl-divider></sl-divider>
 
     <div id="conversionOutputs">
-      <sl-textarea filled resize="auto" name="output-file" label="Output file" help-text="Image metadata"><sl-skeleton effect="none"></sl-skeleton></sl-textarea>
-      <sl-button variant="neutral" outline name="output-download" disabled>Download</sl-button>
+      <sl-details disabled id="output-image-details" summary="Image metadata"></sl-details>
+      <sl-button variant="neutral" outline name="output-download" disabled><sl-icon slot="prefix" name="box-arrow-down"></sl-icon> Download</sl-button>
 <br /><br />
     </div>
 

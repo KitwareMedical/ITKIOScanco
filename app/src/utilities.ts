@@ -22,6 +22,7 @@ function escapeHtml(html) {
   div.remove()
   return escaped
 }
+globalThis.escapeHtml = escapeHtml
 
 export function notify(title, message, variant = 'primary', icon = 'info-circle', duration = 3000) {
   const slAlert = Object.assign(document.createElement('sl-alert'), {
