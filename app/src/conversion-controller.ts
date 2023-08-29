@@ -47,9 +47,8 @@ class ConversionController  {
 
         files[0].arrayBuffer().then((arrayBuffer) => {
             model.inputVolume = new Uint8Array(arrayBuffer)
-            const inputVolumeElement = document.querySelector("#conversionInputs sl-input[name=input-volume]")
-            inputVolumeElement.value = model.inputVolume.subarray(0, 50).toString() + ' ...'
-            inputVolumeElement.helpText = `Input volume size: ${model.inputVolume.length.toString()}  bytes`
+            const inputVolumeDescription = document.getElementById("input-volume-description")
+            inputVolumeDescription.innerHTML = `${files[0].name}, (<sl-format-bytes value="${model.inputVolume.length}"></sl-format-bytes>)`
         })
     })
 
@@ -108,7 +107,6 @@ class ConversionController  {
 
         outputOutputDownload.variant = "success"
         outputOutputDownload.disabled = false
-        const outputOutput = document.querySelector('#conversionOutputs sl-textarea[name=output-file]')
         function replacer (key, value) {
           if (!!value && value.byteLength !== undefined) {
             return String(value.slice(0, 6)) + '...'
@@ -117,7 +115,9 @@ class ConversionController  {
         }
         image.direction = direction
         image.data = "[...]"
-        outputOutput.value = JSON.stringify(image, replacer, 2)
+        const outputOutput = document.getElementById('output-image-details')
+        outputOutput.innerHTML = `<pre>${globalThis.escapeHtml(JSON.stringify(image, replacer, 2))}</pre>`
+        outputOutput.disabled = false
       } catch (error) {
         notify("Error while running pipeline", error.toString(), "danger", "exclamation-octagon")
         throw error
