@@ -24,6 +24,7 @@
   import '@shoelace-style/shoelace/dist/components/option/option.js';
   import '@shoelace-style/shoelace/dist/components/select/select.js';
   import '@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js';
+  import '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js';
 
   import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path';
   setBasePath('/');
@@ -73,7 +74,7 @@
       </sl-select>
       <br />
     <sl-divider></sl-divider>
-    <br /><sl-button name="loadSampleInputs" variant="default" style="display: none;">Load sample</sl-button>
+    <br /><sl-tooltip content="Load example input data. This will overwrite any existing input data."><sl-button name="loadSampleInputs" variant="default" style="display: none;">Load sample</sl-button></sl-tooltip>
     <sl-button type="button" variant="success" name="run">Convert</sl-button>
     <br />
     <br />
