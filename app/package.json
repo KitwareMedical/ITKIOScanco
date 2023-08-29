@@ -23,8 +23,8 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/KitwareMedical/ITKIOScanco#readme",
   "dependencies": {
-    "itk-image-io": "1.0.0-b.119",
-    "itk-wasm": "1.0.0-b.119"
+    "itk-image-io": "1.0.0-b.132",
+    "itk-wasm": "1.0.0-b.132"
   },
   "devDependencies": {
     "@itk-wasm/dam": "^1.0.1",
