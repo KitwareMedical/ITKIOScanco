@@ -6,11 +6,11 @@ settings:
 
 dependencies:
   itk-image-io:
-    specifier: 1.0.0-b.119
-    version: 1.0.0-b.119
+    specifier: 1.0.0-b.132
+    version: 1.0.0-b.132
   itk-wasm:
-    specifier: 1.0.0-b.119
-    version: 1.0.0-b.119
+    specifier: 1.0.0-b.132
+    version: 1.0.0-b.132
 
 devDependencies:
   '@itk-wasm/dam':
@@ -930,16 +930,16 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dev: true
 
-  /itk-image-io@1.0.0-b.119:
-    resolution: {integrity: sha512-srDmhOmwftascqLXmH6mS81ZZQu42xMaQXShPYhpgcH62hUR2YRj8m+mm0UvLYzyY6LpwxLK50td6RUrusunew==}
+  /itk-image-io@1.0.0-b.132:
+    resolution: {integrity: sha512-WHvubOh9zaXLnAGJO0wmElRoBxaq9JvHmrmP05obujBjP1n1LwkH4WXtud6LcWHfSp9BuTM7rdUGyzMigLZbmw==}
     dependencies:
-      itk-wasm: 1.0.0-b.119
+      itk-wasm: 1.0.0-b.132
     transitivePeerDependencies:
       - debug
     dev: false
 
-  /itk-wasm@1.0.0-b.119:
-    resolution: {integrity: sha512-J4zibU8UAgEsCIWCDs7mAYCpm1dOVJoDFzamodlaoaMhBP4JE3VEKCNvorDpQJrxeIM7S5KWMRPPE4565slWrQ==}
+  /itk-wasm@1.0.0-b.132:
+    resolution: {integrity: sha512-sGiOR2hKqdGxDywESg71cdDUzFo3d5RJ882DB5Tdc6j2idGDyguKiJ2BcbjRdpFD+sXmpehgAI/Vmb0me0d9iw==}
     hasBin: true
     dependencies:
       '@babel/runtime': 7.22.6
@@ -950,6 +950,7 @@ packages:
       glob: 8.1.0
       markdown-table: 3.0.3
       mime-types: 2.1.35
+      wasm-feature-detect: 1.5.1
       webworker-promise: 0.4.4
     transitivePeerDependencies:
       - debug
@@ -1372,6 +1373,10 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
+
+  /wasm-feature-detect@1.5.1:
+    resolution: {integrity: sha512-GHr23qmuehNXHY4902/hJ6EV5sUANIJC3R/yMfQ7hWDg3nfhlcJfnIL96R2ohpIwa62araN6aN4bLzzzq5GXkg==}
+    dev: false
 
   /web-streams-polyfill@3.2.1:
     resolution: {integrity: sha512-e0MO3wdXWKrLbL0DgGnUV7WHVuw9OUvL4hjgnPkIeEvESk74gAITi5G606JtZPp39cd8HA9VQzCIvA49LpPN5Q==}
