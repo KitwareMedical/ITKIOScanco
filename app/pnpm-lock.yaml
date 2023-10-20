@@ -5,12 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  itk-image-io:
-    specifier: 1.0.0-b.132
-    version: 1.0.0-b.132
+  '@itk-wasm/image-io':
+    specifier: ^0.3.0
+    version: 0.3.0
   itk-wasm:
-    specifier: 1.0.0-b.132
-    version: 1.0.0-b.132
+    specifier: 1.0.0-b.149
+    version: 1.0.0-b.149
 
 devDependencies:
   '@itk-wasm/dam':
@@ -313,6 +313,14 @@ packages:
       - debug
     dev: true
 
+  /@itk-wasm/image-io@0.3.0:
+    resolution: {integrity: sha512-xXOmQdQ2Pp7N7xgaHeHriVRKav694uXUPikqsesfWcf++zHaJc2RoRvN4/kWcewanWc/zM7RlTLF3Jnxype74Q==}
+    dependencies:
+      itk-wasm: 1.0.0-b.149
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
   /@lit-labs/react@1.2.1:
     resolution: {integrity: sha512-DiZdJYFU0tBbdQkfwwRSwYyI/mcWkg3sWesKRsHUd4G+NekTmmeq9fzsurvcKTNVa0comNljwtg4Hvi1ds3V+A==}
     dev: true
@@ -448,6 +456,10 @@ packages:
       lit: 2.7.6
       qr-creator: 1.0.0
     dev: true
+
+  /@thewtex/zstddec@0.1.2:
+    resolution: {integrity: sha512-Bv50pouFqlmIZDcAA2Nrpk9tjJpAPlqHHeD5h0noK+oNXMimrZ/hMbJK2N09Svr6TI/S6nT63dzkWoim4ZzTuw==}
+    dev: false
 
   /@types/emscripten@1.39.7:
     resolution: {integrity: sha512-tLqYV94vuqDrXh515F/FOGtBcRMTPGvVV1LzLbtYDcQmmhtpf/gLYf+hikBbQk8MzOHNz37wpFfJbYAuSn8HqA==}
@@ -930,19 +942,12 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=7.0.0'}
     dev: true
 
-  /itk-image-io@1.0.0-b.132:
-    resolution: {integrity: sha512-WHvubOh9zaXLnAGJO0wmElRoBxaq9JvHmrmP05obujBjP1n1LwkH4WXtud6LcWHfSp9BuTM7rdUGyzMigLZbmw==}
-    dependencies:
-      itk-wasm: 1.0.0-b.132
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /itk-wasm@1.0.0-b.132:
-    resolution: {integrity: sha512-sGiOR2hKqdGxDywESg71cdDUzFo3d5RJ882DB5Tdc6j2idGDyguKiJ2BcbjRdpFD+sXmpehgAI/Vmb0me0d9iw==}
+  /itk-wasm@1.0.0-b.149:
+    resolution: {integrity: sha512-G1wvURAGMz/0XjHK1TKb4dZLwMV4+zsUZcuEkokH2fVtxWotj93OL3mrJvs7fhQ0Jenusf4COFN4yZ9Xt37SEA==}
     hasBin: true
     dependencies:
       '@babel/runtime': 7.22.6
+      '@thewtex/zstddec': 0.1.2
       '@types/emscripten': 1.39.7
       axios: 1.4.0
       commander: 9.5.0

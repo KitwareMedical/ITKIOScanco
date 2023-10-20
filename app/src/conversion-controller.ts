@@ -1,4 +1,4 @@
-import { readImageArrayBuffer, writeImageArrayBuffer } from "itk-wasm"
+import { readImage, writeImage } from "@itk-wasm/image-io"
 
 import conversionLoadSampleInputs from "./conversion-load-sample-inputs.js"
 import { notify, downloadFile } from "./utilities.js"
@@ -91,19 +91,18 @@ class ConversionController  {
         runButton.loading = true
         const t0 = performance.now()
 
-        const { webWorker, image } = await readImageArrayBuffer(this.webWorker,
-          model.inputVolume.slice(),
-          'volume.aim'
+        const { webWorker, image } = await readImage(this.webWorker,
+          { data: model.inputVolume.slice(), path: 'volume.isq' }
         )
         this.webWorker = webWorker
         // Avoid later use of detached buffer
         const direction = image.direction.slice()
-        const { arrayBuffer } = await writeImageArrayBuffer(webWorker, image, `${model.inputFileName}.${model.outputFormat}`)
+        const { serializedImage } = await writeImage(webWorker, image, `${model.inputFileName}.${model.outputFormat}`)
 
         const t1 = performance.now()
         notify("conversion successfully completed", `in ${t1 - t0} milliseconds.`, "success", "rocket-fill")
 
-        model.outputVolume = new Uint8Array(arrayBuffer)
+        model.outputVolume = new Uint8Array(serializedImage.data)
 
         outputOutputDownload.variant = "success"
         outputOutputDownload.disabled = false

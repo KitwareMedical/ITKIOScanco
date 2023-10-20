@@ -5,7 +5,7 @@ export default async function conversionLoadSampleInputs (model) {
 
   const inputVolumeDescription = document.getElementById("input-volume-description")
 
-  const url = import.meta.env.DEV ? '/sample-data/AIMIOTestImage.AIM' : 'https://itk.mypinata.cloud/ipfs/QmPaZBXqb99fsKQi28tCuGpW1LgiVrBYKRimY28nA9mYgE'
+  const url = import.meta.env.DEV ? '/sample-data/AIMIOTestImage.AIM' : 'https://data.kitware.com/api/v1/file/653283f75be10c8fb6ed4efc/download'
   const response = await fetch(url)
   const contentLength = parseInt(response.headers.get('Content-Length'))
   inputVolumeDescription.innerHTML = `Sample AIM volume size: <sl-format-bytes value="${contentLength}"></sl-format-bytes>`
