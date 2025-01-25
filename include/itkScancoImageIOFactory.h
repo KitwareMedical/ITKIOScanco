@@ -50,7 +50,7 @@ public:
   itkFactorylessNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-   itkOverrideGetNameOfClassMacro(ScancoImageIOFactory);
+  itkOverrideGetNameOfClassMacro(ScancoImageIOFactory);
 
   /** Register one factory of this type  */
   static void
