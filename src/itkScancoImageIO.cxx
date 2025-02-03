@@ -61,10 +61,7 @@ ScancoImageIO::ScancoImageIO()
 }
 
 
-ScancoImageIO::~ScancoImageIO()
-{
-  delete[] this->m_RawHeader;
-}
+ScancoImageIO::~ScancoImageIO() { delete[] this->m_RawHeader; }
 
 
 void

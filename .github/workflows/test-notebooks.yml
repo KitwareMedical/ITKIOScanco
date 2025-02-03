@@ -8,11 +8,11 @@ jobs:
     strategy:
       max-parallel: 3
       matrix:
-        os: [ubuntu-22.04, macos-12, windows-2022]
+        os: [ubuntu-24.04, macos-15, windows-2022]
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/checkout@v4.2.2
+    - uses: actions/setup-python@v5.4.0
       with:
         python-version: '3.9'
     - name: Install build dependencies
