@@ -5,10 +5,6 @@ ITKIOScanco
     :target: https://github.com/KitwareMedical/ITKIOScanco/actions/workflows/build-test-package.yml
     :alt: Build, test, package
 
-.. image:: https://github.com/KitwareMedical/ITKIOScanco/actions/workflows/test-notebooks.yml/badge.svg
-    :target: https://github.com/KitwareMedical/ITKIOScanco/actions/workflows/test-notebooks.yml
-    :alt: Notebooks tests
-
 .. image:: https://img.shields.io/pypi/v/itk-ioscanco.svg
     :target: https://pypi.python.org/pypi/itk-ioscanco
     :alt: PyPI Version
