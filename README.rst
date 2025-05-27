@@ -1,24 +1,20 @@
 ITKIOScanco
 ===========
 
-.. image:: https://github.com/KitwareMedical/ITKIOScanco/workflows/Build,%20test,%20package/badge.svg
-    :target: https://github.com/KitwareMedical/ITKIOScanco/actions/workflows/build-test-package.yml
+.. image:: https://github.com/InsightSoftwareConsortium/ITKIOScanco/workflows/Build,%20test,%20package/badge.svg
+    :target: https://github.com/InsightSoftwareConsortium/ITKIOScanco/actions/workflows/build-test-package.yml
     :alt: Build, test, package
-
-.. image:: https://github.com/KitwareMedical/ITKIOScanco/actions/workflows/test-notebooks.yml/badge.svg
-    :target: https://github.com/KitwareMedical/ITKIOScanco/actions/workflows/test-notebooks.yml
-    :alt: Notebooks tests
 
 .. image:: https://img.shields.io/pypi/v/itk-ioscanco.svg
     :target: https://pypi.python.org/pypi/itk-ioscanco
     :alt: PyPI Version
 
 .. image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
-    :target: https://github.com/KitwareMedical/ITKIOScanco/blob/master/LICENSE
+    :target: https://github.com/InsightSoftwareConsortium/ITKIOScanco/blob/master/LICENSE
     :alt: License
 
 .. image:: https://mybinder.org/badge.svg
-    :target: https://mybinder.org/v2/gh/KitwareMedical/ITKIOScanco/master?filepath=examples%2FReadISQ.ipynb
+    :target: https://mybinder.org/v2/gh/InsightSoftwareConsortium/ITKIOScanco/master?filepath=examples%2FReadISQ.ipynb
 
 Overview
 --------
@@ -50,7 +46,7 @@ C++
 
 Build the module as a separate project against an ITK build tree::
 
-  git clone https://github.com/KitwareMedical/ITKIOScanco
+  git clone https://github.com/InsightSoftwareConsortium/ITKIOScanco
   mkdir ITKIOScanco-build
   cd ITKIOScanco-build
   cmake -DITK_DIR=/your/path/to/ITK-build ../ITKIOScanco

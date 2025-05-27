@@ -40,8 +40,8 @@ dependencies = [
 ]
 
 [project.urls]
-Download = "https://github.com/KitwareMedical/ITKIOScanco"
-Homepage = "https://github.com/KitwareMedical/ITKIOScanco"
+Download = "https://github.com/InsightSoftwareConsortium/ITKIOScanco"
+Homepage = "https://github.com/InsightSoftwareConsortium/ITKIOScanco"
 
 [tool.scikit-build]
 # The versions of CMake to allow. If CMake is not present on the system or does
