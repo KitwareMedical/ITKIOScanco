@@ -304,7 +304,7 @@ packages:
     resolution: {integrity: sha512-6RGmBp5iYHeNIOjiPNVBD4snCSItkGN79n9kTC2TQYglRRTpmdl53YP7QQeWty91fq6XxZsvtwH4lAeG+wJjfw==}
     hasBin: true
     dependencies:
-      axios: 1.4.0
+      axios: 1.6.1
       commander: 10.0.1
       files-from-path: 1.0.0
       ipfs-car: 1.0.0
@@ -504,8 +504,8 @@ packages:
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  /axios@1.4.0:
-    resolution: {integrity: sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==}
+  /axios@1.6.1:
+    resolution: {integrity: sha512-vfBmhDpKafglh0EldBEbVuoe7DyAavGSLWhuSm5ZSEKQnHhBf0xAAwybbNH1IkrJNGnS/VG4I5yxig1pCEXE4g==}
     dependencies:
       follow-redirects: 1.15.4
       form-data: 4.0.0
@@ -949,7 +949,7 @@ packages:
       '@babel/runtime': 7.22.6
       '@thewtex/zstddec': 0.1.2
       '@types/emscripten': 1.39.7
-      axios: 1.4.0
+      axios: 1.6.1
       commander: 9.5.0
       fs-extra: 10.1.0
       glob: 8.1.0
