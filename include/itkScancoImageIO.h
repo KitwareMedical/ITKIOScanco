@@ -312,61 +312,6 @@ protected:
   PrintSelf(std::ostream & os, Indent indent) const override;
 
 private:
-  /** Check the file header to see what type of file it is.
-   *
-   *  Return values are: 0 if unrecognized, 1 if ISQ/RAD,
-   *  2 if AIM 020, 3 if AIM 030.
-   */
-  int
-  CheckVersion(const char header[16]);
-
-  /** Convert char data to 32-bit int (little-endian). */
-  static int
-  DecodeInt(const void * data);
-  /** Convert 32-bit int (little-endian) to char data. */
-  static void
-  EncodeInt(int data, void * target);
-
-  /** Convert char data to float (single precision). */
-  static float
-  DecodeFloat(const void * data);
-
-  /** Convert char data to float (double precision). */
-  static double
-  DecodeDouble(const void * data);
-
-  //! Convert a VMS timestamp to a calendar date.
-  void
-  DecodeDate(const void * data,
-             int &        year,
-             int &        month,
-             int &        day,
-             int &        hour,
-             int &        minute,
-             int &        second,
-             int &        millis);
-
-  /** Convert the current calendar date to a VMS timestamp and store in target */
-  void
-  EncodeCurrentDate(void * target);
-
-  /** Convert a calendar date to VMS timestamp
-   *
-   * \param target Pointer to a buffer of at least 8 bytes.
-   * \param dateString  A string in the format "YYYY-MM-DD HH:MM:SS.mmm"
-  */
-  void
-  EncodeDateFromString(void * target, const char dateString[32]);
-
-  //! Strip a string by removing trailing whitespace.
-  /*!
-   *  The dest must have a size of at least l+1.
-   */
-  static void
-  StripString(char * dest, const char * source, size_t length);
-  static void
-  PadString(char * dest, const char * source, size_t length);
-
   /** Rescale the image data to Hounsfield Units */
   template <typename TBufferType>
   void

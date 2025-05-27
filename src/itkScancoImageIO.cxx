@@ -37,21 +37,10 @@
 #include "itkIntTypes.h"
 #include "itkByteSwapper.h"
 #include "itkMetaDataObject.h"
+#include "itkDataManipulation.h"
 
 #include <algorithm>
 #include <ctime>
-#include <map>
-
-/** VMS time conversion constants */
-/** This is the offset between the astronomical "Julian day", which counts
-* days since January 1, 4713BC, and the "VMS epoch", which counts from
-* November 17, 1858:
-*/
-constexpr uint64_t julianOffset = 2400001;
-constexpr uint64_t millisPerSecond = 1000;
-constexpr uint64_t millisPerMinute = 60 * 1000;
-constexpr uint64_t millisPerHour = 3600 * 1000;
-constexpr uint64_t millisPerDay = 3600 * 24 * 1000;
 
 namespace itk
 {
@@ -82,233 +71,6 @@ ScancoImageIO::PrintSelf(std::ostream & os, Indent indent) const
   Superclass::PrintSelf(os, indent);
 }
 
-
-int
-ScancoImageIO::CheckVersion(const char header[16])
-{
-  int fileType = 0;
-
-  if (strncmp(header, "CTDATA-HEADER_V1", 16) == 0)
-  {
-    fileType = 1;
-  }
-  else if (strcmp(header, "AIMDATA_V030   ") == 0)
-  {
-    fileType = 3;
-  }
-  else
-  {
-    int preHeaderSize = ScancoImageIO::DecodeInt(header);
-    int imageHeaderSize = ScancoImageIO::DecodeInt(header + 4);
-    if (preHeaderSize == 20 && imageHeaderSize == 140)
-    {
-      fileType = 2;
-    }
-  }
-
-  return fileType;
-}
-
-
-int
-ScancoImageIO::DecodeInt(const void * data)
-{
-  const auto * cp = static_cast<const unsigned char *>(data);
-  return (cp[0] | (cp[1] << 8) | (cp[2] << 16) | (cp[3] << 24));
-}
-
-
-void
-ScancoImageIO::EncodeInt(int data, void * target)
-{
-  auto * targetAsUnsignedChar = static_cast<unsigned char *>(target);
-  targetAsUnsignedChar[0] = (unsigned char)(data);
-  targetAsUnsignedChar[1] = (unsigned char)(data >> 8);
-  targetAsUnsignedChar[2] = (unsigned char)(data >> 16);
-  targetAsUnsignedChar[3] = (unsigned char)(data >> 24);
-}
-
-
-float
-ScancoImageIO::DecodeFloat(const void * data)
-{
-  const auto * cp = static_cast<const unsigned char *>(data);
-  // different ordering and exponent bias than IEEE 754 float
-  union
-  {
-    float        f;
-    unsigned int i;
-  } v;
-  v.i = (cp[0] << 16) | (cp[1] << 24) | cp[2] | (cp[3] << 8);
-  return 0.25 * v.f;
-}
-
-
-double
-ScancoImageIO::DecodeDouble(const void * data)
-{
-  // different ordering and exponent bias than IEEE 754 double
-  const auto * cp = static_cast<const unsigned char *>(data);
-  union
-  {
-    double   d;
-    uint64_t l;
-  } v;
-  unsigned int l1, l2;
-  l1 = (cp[0] << 16) | (cp[1] << 24) | cp[2] | (cp[3] << 8);
-  l2 = (cp[4] << 16) | (cp[5] << 24) | cp[6] | (cp[7] << 8);
-  v.l = (static_cast<uint64_t>(l1) << 32) | l2;
-  return v.d * 0.25;
-}
-
-/** This algorithm is from Henry F. Fliegel and Thomas C. Van Flandern
- * This uses the Gregorian calendar starting from October 15, 1582
- * \param julianDay The Julian day vaulue to convert
- * \param year The extracted Gregorian year
- * \param month The extracted Gregorian month
- * \param day The extracted Gregorian day
- */
-void
-GregorianDateFromJulian(int julianDay, int & year, int & month, int & day) {
-  int ell, n, i, j = 0;
-  ell = julianDay + 68569;
-  n = (4 * ell) / 146097;
-  ell = ell - (146097 * n + 3) / 4;
-  i = (4000 * (ell + 1)) / 1461001;
-  ell = ell - (1461 * i) / 4 + 31;
-  j = (80 * ell) / 2447;
-  day = ell - (2447 * j) / 80;
-  ell = j / 11;
-  month = j + 2 - (12 * ell);
-  year = 100 * (n - 49) + i + ell;
-}
-
-void
-ScancoImageIO::DecodeDate(const void * data,
-                          int &        year,
-                          int &        month,
-                          int &        day,
-                          int &        hour,
-                          int &        minute,
-                          int &        second,
-                          int &        millis)
-{
-  // Read the date as a long integer with units of 1e-7 seconds
-  int      d1 = ScancoImageIO::DecodeInt(data);
-  int      d2 = ScancoImageIO::DecodeInt(static_cast<const char *>(data) + 4);
-  uint64_t tVMS = d1 + (static_cast<uint64_t>(d2) << 32);
-  uint64_t time = tVMS / 10000 + julianOffset * millisPerDay;
-
-  // Extract the number of days since the Julian epoch
-  int julianDay = static_cast<int>(time / millisPerDay);
-  time -= millisPerDay * julianDay;
-
-  GregorianDateFromJulian(julianDay, year, month, day);
-
-  // Convert the remaining time into hours, minutes, seconds, and milliseconds
-  hour = static_cast<int>(time / millisPerHour);
-  time -= hour * millisPerHour;
-  minute = static_cast<int>(time / millisPerMinute);
-  time -= minute * millisPerMinute;
-  second = static_cast<int>(time / millisPerSecond);
-  time -= second * millisPerSecond;
-  millis = static_cast<int>(time);
-}
-
-
-void
-ScancoImageIO::EncodeCurrentDate(void * target)
-{
-  time_t currentTimeUnix;
-  std::time(&currentTimeUnix);
-  const uint64_t currentTimeVMS = currentTimeUnix * 10000000 + 3506716800;
-
-  const int d1 = (int)currentTimeVMS;
-  const int d2 = (int)(currentTimeVMS >> 32);
-  ScancoImageIO::EncodeInt(d1, target);
-  ScancoImageIO::EncodeInt(d2, static_cast<char *>(target) + 4);
-}
-
-/** This algorithm is from Henry F. Fliegel and Thomas C. Van Flandern
- * It converts a Gregorian date to a Julian day number.
- * 
- * \param year The year in the Gregorian calendar
- * \param month The month in the Gregorian calendar
- * \param day The day in the Gregorian calendar 
- */
-int 
-julianDayFromDate(int year, int month, int day)
-{
-  // If month is January or February, treat them as months 13 and 14 of the previous year
-  if (month <= 2) {
-      year -= 1;
-      month += 12;
-  }
-  int a = year / 100;
-  int b = 2 - a + (a / 4);
-  int julianDay = static_cast<int>(365.25 * (year + 4716))
-                + static_cast<int>(30.6001 * (month + 1))
-                + day + b - 1524.5;
-  return julianDay;
-}
-
-void
-ScancoImageIO::EncodeDateFromString(void * target, const char dateString[32])
-{
-  int year, day, hour, minute, second, millis = 0;
-  char monthStr[4];
-  if (std::sscanf(dateString, "%d-%3s-%d %d:%d:%d.%d", &day, monthStr, &year, &hour, &minute, &second, &millis) != 7)
-  {
-    itkExceptionMacro("Invalid date string format. Expected format: YYYY-MMM-DD HH:MM:SS.MSS");
-  }
-
-  int month = 0;
-  std::map<std::string, int> months
-  {
-    { "XXX", 0 },
-    { "JAN", 1 },
-    { "FEB", 2 },
-    { "MAR", 3 },
-    { "APR", 4 },
-    { "MAY", 5 },
-    { "JUN", 6 },
-    { "JUL", 7 },
-    { "AUG", 8 },
-    { "SEP", 9 },
-    { "OCT", 10 },
-    { "NOV", 11 },
-    { "DEC", 12 }
-  };
-
-  const auto iter = months.find(monthStr);
-
-  if(iter != months.cend()) {
-    month = iter->second;
-  } 
-  else 
-  {
-    itkExceptionMacro("Unrecognized month in date string: " << *dateString);
-  }
-
-  // add time values to single time total in ms
-  uint64_t timestamp =  hour * millisPerHour + 
-                        minute * millisPerMinute +
-                        second * millisPerSecond + 
-                        millis;
-
-  // Calculate the Julian day from the date
-  int julianDay = julianDayFromDate(year, month, day);
-
-  uint64_t time = static_cast<uint64_t>(julianDay * millisPerDay) + timestamp;
-  uint64_t tVMS = (time - julianOffset * millisPerDay) * 10000; // Convert to VMS format
-
-  int d1 = static_cast<int>(tVMS);
-  int d2 = static_cast<int>(tVMS >> 32);
-  ScancoImageIO::EncodeInt(d1, target);
-  ScancoImageIO::EncodeInt(d2, static_cast<char *>(target) + 4);
-}
-
-
 bool
 ScancoImageIO::CanReadFile(const char * filename)
 {
@@ -325,7 +87,7 @@ ScancoImageIO::CanReadFile(const char * filename)
       infile.read(buffer, 512);
       if (!infile.bad())
       {
-        int fileType = ScancoImageIO::CheckVersion(buffer);
+        int fileType = CheckVersion(buffer);
         canRead = (fileType > 0);
       }
     }
@@ -387,37 +149,6 @@ ScancoImageIO::InitializeHeader()
   this->m_HeaderInitialized = true;
 }
 
-
-void
-ScancoImageIO::StripString(char * dest, const char * source, size_t length)
-{
-  char * dp = dest;
-  for (size_t i = 0; i < length && *source != '\0'; ++i)
-  {
-    *dp++ = *source++;
-  }
-  while (dp != dest && dp[-1] == ' ')
-  {
-    --dp;
-  }
-  *dp = '\0';
-}
-
-
-void
-ScancoImageIO::PadString(char * dest, const char * source, size_t length)
-{
-  for (size_t i = 0; i < length && *source != '\0'; ++i)
-  {
-    *dest++ = *source++;
-  }
-  for (size_t i = 0; i < length; ++i)
-  {
-    *dest++ = ' ';
-  }
-}
-
-
 int
 ScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned long bytesRead)
 {
@@ -427,111 +158,111 @@ ScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned long bytesRead)
   }
 
   char * h = this->m_RawHeader;
-  ScancoImageIO::StripString(this->m_Version, h, 16);
+  StripString(this->m_Version, h, 16);
   h += 16;
-  int dataType = ScancoImageIO::DecodeInt(h);
+  int dataType = DecodeInt(h);
   h += 4;
-  const int numBytes = ScancoImageIO::DecodeInt(h);
+  const int numBytes = DecodeInt(h);
   h += 4;
   (void)numBytes;
-  const int numBlocks = ScancoImageIO::DecodeInt(h);
+  const int numBlocks = DecodeInt(h);
   h += 4;
   (void)numBlocks;
-  this->m_PatientIndex = ScancoImageIO::DecodeInt(h);
+  this->m_PatientIndex = DecodeInt(h);
   h += 4;
-  this->m_ScannerID = ScancoImageIO::DecodeInt(h);
+  this->m_ScannerID = DecodeInt(h);
   h += 4;
   int year, month, day, hour, minute, second, milli;
-  ScancoImageIO::DecodeDate(h, year, month, day, hour, minute, second, milli);
+  DecodeDate(h, year, month, day, hour, minute, second, milli);
   h += 8;
   int pixdim[3], physdim[3];
-  pixdim[0] = ScancoImageIO::DecodeInt(h);
+  pixdim[0] = DecodeInt(h);
   h += 4;
-  pixdim[1] = ScancoImageIO::DecodeInt(h);
+  pixdim[1] = DecodeInt(h);
   h += 4;
-  pixdim[2] = ScancoImageIO::DecodeInt(h);
+  pixdim[2] = DecodeInt(h);
   h += 4;
-  physdim[0] = ScancoImageIO::DecodeInt(h);
+  physdim[0] = DecodeInt(h);
   h += 4;
-  physdim[1] = ScancoImageIO::DecodeInt(h);
+  physdim[1] = DecodeInt(h);
   h += 4;
-  physdim[2] = ScancoImageIO::DecodeInt(h);
+  physdim[2] = DecodeInt(h);
   h += 4;
 
   const bool isRAD = (dataType == 9 || physdim[2] == 0);
 
   if (isRAD) // RAD file
   {
-    this->m_MeasurementIndex = ScancoImageIO::DecodeInt(h);
+    this->m_MeasurementIndex = DecodeInt(h);
     h += 4;
-    this->m_DataRange[0] = ScancoImageIO::DecodeInt(h);
+    this->m_DataRange[0] = DecodeInt(h);
     h += 4;
-    this->m_DataRange[1] = ScancoImageIO::DecodeInt(h);
+    this->m_DataRange[1] = DecodeInt(h);
     h += 4;
-    this->m_MuScaling = ScancoImageIO::DecodeInt(h);
+    this->m_MuScaling = DecodeInt(h);
     h += 4;
-    ScancoImageIO::StripString(this->m_PatientName, h, 40);
+    StripString(this->m_PatientName, h, 40);
     h += 40;
-    this->m_ZPosition = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_ZPosition = DecodeInt(h) * 1e-3;
     h += 4;
     /* unknown */ h += 4;
-    this->m_SampleTime = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_SampleTime = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_Energy = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_Energy = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_Intensity = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_Intensity = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_ReferenceLine = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_ReferenceLine = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_StartPosition = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_StartPosition = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_EndPosition = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_EndPosition = DecodeInt(h) * 1e-3;
     h += 4;
     h += 88 * 4;
   }
   else // ISQ file or RSQ file
   {
-    this->m_SliceThickness = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_SliceThickness = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_SliceIncrement = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_SliceIncrement = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_StartPosition = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_StartPosition = DecodeInt(h) * 1e-3;
     h += 4;
     this->m_EndPosition = this->m_StartPosition + physdim[2] * 1e-3 * (pixdim[2] - 1) / pixdim[2];
-    this->m_DataRange[0] = ScancoImageIO::DecodeInt(h);
+    this->m_DataRange[0] = DecodeInt(h);
     h += 4;
-    this->m_DataRange[1] = ScancoImageIO::DecodeInt(h);
+    this->m_DataRange[1] = DecodeInt(h);
     h += 4;
-    this->m_MuScaling = ScancoImageIO::DecodeInt(h);
+    this->m_MuScaling = DecodeInt(h);
     h += 4;
-    this->m_NumberOfSamples = ScancoImageIO::DecodeInt(h);
+    this->m_NumberOfSamples = DecodeInt(h);
     h += 4;
-    this->m_NumberOfProjections = ScancoImageIO::DecodeInt(h);
+    this->m_NumberOfProjections = DecodeInt(h);
     h += 4;
-    this->m_ScanDistance = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_ScanDistance = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_ScannerType = ScancoImageIO::DecodeInt(h);
+    this->m_ScannerType = DecodeInt(h);
     h += 4;
-    this->m_SampleTime = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_SampleTime = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_MeasurementIndex = ScancoImageIO::DecodeInt(h);
+    this->m_MeasurementIndex = DecodeInt(h);
     h += 4;
-    this->m_Site = ScancoImageIO::DecodeInt(h);
+    this->m_Site = DecodeInt(h);
     h += 4;
-    this->m_ReferenceLine = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_ReferenceLine = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_ReconstructionAlg = ScancoImageIO::DecodeInt(h);
+    this->m_ReconstructionAlg = DecodeInt(h);
     h += 4;
-    ScancoImageIO::StripString(this->m_PatientName, h, 40);
+    StripString(this->m_PatientName, h, 40);
     h += 40;
-    this->m_Energy = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_Energy = DecodeInt(h) * 1e-3;
     h += 4;
-    this->m_Intensity = ScancoImageIO::DecodeInt(h) * 1e-3;
+    this->m_Intensity = DecodeInt(h) * 1e-3;
     h += 4;
     h += 83 * 4;
   }
 
-  int dataOffset = ScancoImageIO::DecodeInt(h);
+  int dataOffset = DecodeInt(h);
 
   // fix m_SliceThickness and m_SliceIncrement if they were truncated
   if (physdim[2] != 0)
@@ -644,7 +375,7 @@ ScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned long bytesRead)
     unsigned long hsize = 0;
     for (int i = 0; i < 4; ++i)
     {
-      hsize = ScancoImageIO::DecodeInt(h + i * 128 + 24);
+      hsize = DecodeInt(h + i * 128 + 24);
       if ((1 + hskip + hsize) * 512 > headerSize)
       {
         break;
@@ -661,16 +392,16 @@ ScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned long bytesRead)
     if (calHeader && calHeaderSize >= 1024)
     {
       h = calHeader;
-      ScancoImageIO::StripString(this->m_CalibrationData, h + 28, 64);
+      StripString(this->m_CalibrationData, h + 28, 64);
       // std::string calFile(h + 112, 256);
       // std::string s3(h + 376, 256);
-      this->m_RescaleType = ScancoImageIO::DecodeInt(h + 632);
-      ScancoImageIO::StripString(this->m_RescaleUnits, h + 648, 16);
+      this->m_RescaleType = DecodeInt(h + 632);
+      StripString(this->m_RescaleUnits, h + 648, 16);
       // std::string s5(h + 700, 16);
       // std::string calFilter(h + 772, 16);
-      this->m_RescaleSlope = ScancoImageIO::DecodeDouble(h + 664);
-      this->m_RescaleIntercept = ScancoImageIO::DecodeDouble(h + 672);
-      this->m_MuWater = ScancoImageIO::DecodeDouble(h + 688);
+      this->m_RescaleSlope = DecodeDouble(h + 664);
+      this->m_RescaleIntercept = DecodeDouble(h + 672);
+      this->m_MuWater = DecodeDouble(h + 688);
     }
   }
 
@@ -712,11 +443,11 @@ ScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
   // Read the pre-header
   // AIM header is divided into 3 sections: a preheader, a struct containing volume info, and a processing log
   char * preheader = h;
-  int    preheaderSize = ScancoImageIO::DecodeInt(h);
+  int    preheaderSize = DecodeInt(h);
   h += intSize;
-  int structSize = ScancoImageIO::DecodeInt(h);
+  int structSize = DecodeInt(h);
   h += intSize;
-  int logSize = ScancoImageIO::DecodeInt(h);
+  int logSize = DecodeInt(h);
   h += intSize;
 
   // read the rest of the header
@@ -753,7 +484,7 @@ ScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
     h += 20;
   }
 
-  int dataType = ScancoImageIO::DecodeInt(h);
+  int dataType = DecodeInt(h);
   h += 4;
 
   // The struct contains the following data:
@@ -763,7 +494,7 @@ ScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
   int structValues[21];
   for (int & structValue : structValues)
   {
-    structValue = ScancoImageIO::DecodeInt(h);
+    structValue = DecodeInt(h);
     h += intSize;
   }
 
@@ -774,7 +505,7 @@ ScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
     // AIMDATA_V030
     for (float & i : elementSize)
     {
-      i = 1e-6 * ScancoImageIO::DecodeInt(h);
+      i = 1e-6 * DecodeInt(h);
       if (i == 0)
       {
         i = 1.0;
@@ -787,7 +518,7 @@ ScancoImageIO::ReadAIMHeader(std::ifstream * file, unsigned long bytesRead)
     // AIMDATA_V020
     for (float & i : elementSize)
     {
-      i = ScancoImageIO::DecodeFloat(h);
+      i = DecodeFloat(h);
       if (i == 0)
       {
         i = 1.0;
@@ -1071,7 +802,7 @@ ScancoImageIO::ReadImageInformation()
   if (!infile.bad())
   {
     bytesRead = static_cast<unsigned long>(infile.gcount());
-    fileType = ScancoImageIO::CheckVersion(this->m_RawHeader);
+    fileType = CheckVersion(this->m_RawHeader);
   }
 
   if (fileType == 0)
@@ -1274,11 +1005,11 @@ ScancoImageIO::Read(void * buffer)
     // Get the size of the compressed data
     char head[8];
     infile.read(head, intSize);
-    size = static_cast<unsigned int>(ScancoImageIO::DecodeInt(head));
+    size = static_cast<unsigned int>(DecodeInt(head));
     if (intSize == 8)
     {
       // Read the high word of a 64-bit int
-      unsigned int high = ScancoImageIO::DecodeInt(head + 4);
+      unsigned int high = DecodeInt(head + 4);
       size += (static_cast<uint64_t>(high) << 32);
     }
     input = new char[size - intSize];
@@ -1466,84 +1197,84 @@ ScancoImageIO::WriteISQHeader(std::ofstream * file)
   this->m_RawHeader = new char[512];
   char * header = this->m_RawHeader;
 
-  ScancoImageIO::PadString(header, this->m_Version, 16);
+  PadString(header, this->m_Version, 16);
   header += 16;
   // 3 -> ISQ data type
-  ScancoImageIO::EncodeInt(3, header);
+  EncodeInt(3, header);
   header += 4;
   const auto numberOfBytes = static_cast<SizeValueType>(this->GetImageSizeInBytes());
   if (numberOfBytes > NumericTraits<int>::max())
   {
-    ScancoImageIO::EncodeInt(0, header);
+    EncodeInt(0, header);
     header += 4;
   }
   else
   {
-    ScancoImageIO::EncodeInt(numberOfBytes, header);
+    EncodeInt(numberOfBytes, header);
     header += 4;
   }
-  ScancoImageIO::EncodeInt(numberOfBytes / 512, header);
+  EncodeInt(numberOfBytes / 512, header);
   header += 4;
-  ScancoImageIO::EncodeInt(this->m_PatientIndex, header);
+  EncodeInt(this->m_PatientIndex, header);
   header += 4;
-  ScancoImageIO::EncodeInt(this->m_ScannerID, header);
+  EncodeInt(this->m_ScannerID, header);
   header += 4;
-  ScancoImageIO::EncodeDateFromString(header, this->m_CreationDate);
+  EncodeDateFromString(header, this->m_CreationDate);
   header += 8;
   for (unsigned int dimension = 0; dimension < 3; ++dimension)
   {
     // pixdim
-    ScancoImageIO::EncodeInt(this->GetDimensions(dimension), header);
+    EncodeInt(this->GetDimensions(dimension), header);
     header += 4;
   }
   for (unsigned int dimension = 0; dimension < 3; ++dimension)
   {
     // physdim
-    ScancoImageIO::EncodeInt(this->GetSpacing(dimension) * this->GetDimensions(dimension) * 1e3, header);
+    EncodeInt(this->GetSpacing(dimension) * this->GetDimensions(dimension) * 1e3, header);
     header += 4;
   }
-  ScancoImageIO::EncodeInt((int)(this->m_SliceThickness * 1e3), header);
+  EncodeInt((int)(this->m_SliceThickness * 1e3), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_SliceIncrement * 1e3), header);
+  EncodeInt((int)(this->m_SliceIncrement * 1e3), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_StartPosition * 1e3), header);
+  EncodeInt((int)(this->m_StartPosition * 1e3), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_DataRange[0]), header);
+  EncodeInt((int)(this->m_DataRange[0]), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_DataRange[1]), header);
+  EncodeInt((int)(this->m_DataRange[1]), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_MuScaling), header);
+  EncodeInt((int)(this->m_MuScaling), header);
   header += 4;
-  ScancoImageIO::EncodeInt(this->m_NumberOfSamples, header);
+  EncodeInt(this->m_NumberOfSamples, header);
   header += 4;
-  ScancoImageIO::EncodeInt(this->m_NumberOfProjections, header);
+  EncodeInt(this->m_NumberOfProjections, header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_ScanDistance * 1e3), header);
+  EncodeInt((int)(this->m_ScanDistance * 1e3), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_ScannerType), header);
+  EncodeInt((int)(this->m_ScannerType), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_SampleTime * 1e3), header);
+  EncodeInt((int)(this->m_SampleTime * 1e3), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_MeasurementIndex), header);
+  EncodeInt((int)(this->m_MeasurementIndex), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_Site), header);
+  EncodeInt((int)(this->m_Site), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_ReferenceLine * 1e3), header);
+  EncodeInt((int)(this->m_ReferenceLine * 1e3), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_ReconstructionAlg), header);
+  EncodeInt((int)(this->m_ReconstructionAlg), header);
   header += 4;
-  ScancoImageIO::PadString(header, this->m_PatientName, 40);
+  PadString(header, this->m_PatientName, 40);
   header += 40;
-  ScancoImageIO::EncodeInt((int)(this->m_Energy * 1e3), header);
+  EncodeInt((int)(this->m_Energy * 1e3), header);
   header += 4;
-  ScancoImageIO::EncodeInt((int)(this->m_Intensity * 1e3), header);
+  EncodeInt((int)(this->m_Intensity * 1e3), header);
   header += 4;
   const std::size_t fillSize = 83 * 4;
   std::memset(header, 0x00, fillSize);
   header += fillSize;
-  // dataOffset
+  // dataOffset todo @erica, no offset?
   const int dataOffset = 0;
-  ScancoImageIO::EncodeInt(dataOffset, header);
+  EncodeInt(dataOffset, header);
   header += 4;
 
   this->m_HeaderSize = static_cast<SizeValueType>(dataOffset + 1) * 512;
