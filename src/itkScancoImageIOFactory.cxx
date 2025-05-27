@@ -45,7 +45,7 @@ ScancoImageIOFactory::GetDescription() const
 static bool ScancoImageIOFactoryHasBeenRegistered;
 
 void IOScanco_EXPORT
-     ScancoImageIOFactoryRegister__Private()
+ScancoImageIOFactoryRegister__Private()
 {
   if (!ScancoImageIOFactoryHasBeenRegistered)
   {
