@@ -40,6 +40,18 @@
 
 #include <algorithm>
 #include <ctime>
+#include <map>
+
+/** VMS time conversion constants */
+/** This is the offset between the astronomical "Julian day", which counts
+* days since January 1, 4713BC, and the "VMS epoch", which counts from
+* November 17, 1858:
+*/
+constexpr uint64_t julianOffset = 2400001;
+constexpr uint64_t millisPerSecond = 1000;
+constexpr uint64_t millisPerMinute = 60 * 1000;
+constexpr uint64_t millisPerHour = 3600 * 1000;
+constexpr uint64_t millisPerDay = 3600 * 24 * 1000;
 
 namespace itk
 {
@@ -149,6 +161,27 @@ ScancoImageIO::DecodeDouble(const void * data)
   return v.d * 0.25;
 }
 
+/** This algorithm is from Henry F. Fliegel and Thomas C. Van Flandern
+ * This uses the Gregorian calendar starting from October 15, 1582
+ * \param julianDay The Julian day vaulue to convert
+ * \param year The extracted Gregorian year
+ * \param month The extracted Gregorian month
+ * \param day The extracted Gregorian day
+ */
+void
+GregorianDateFromJulian(int julianDay, int & year, int & month, int & day) {
+  int ell, n, i, j = 0;
+  ell = julianDay + 68569;
+  n = (4 * ell) / 146097;
+  ell = ell - (146097 * n + 3) / 4;
+  i = (4000 * (ell + 1)) / 1461001;
+  ell = ell - (1461 * i) / 4 + 31;
+  j = (80 * ell) / 2447;
+  day = ell - (2447 * j) / 80;
+  ell = j / 11;
+  month = j + 2 - (12 * ell);
+  year = 100 * (n - 49) + i + ell;
+}
 
 void
 ScancoImageIO::DecodeDate(const void * data,
@@ -160,43 +193,19 @@ ScancoImageIO::DecodeDate(const void * data,
                           int &        second,
                           int &        millis)
 {
-  // This is the offset between the astronomical "Julian day", which counts
-  // days since January 1, 4713BC, and the "VMS epoch", which counts from
-  // November 17, 1858:
-  const uint64_t julianOffset = 2400001;
-  const uint64_t millisPerSecond = 1000;
-  const uint64_t millisPerMinute = 60 * 1000;
-  const uint64_t millisPerHour = 3600 * 1000;
-  const uint64_t millisPerDay = 3600 * 24 * 1000;
-
   // Read the date as a long integer with units of 1e-7 seconds
   int      d1 = ScancoImageIO::DecodeInt(data);
   int      d2 = ScancoImageIO::DecodeInt(static_cast<const char *>(data) + 4);
   uint64_t tVMS = d1 + (static_cast<uint64_t>(d2) << 32);
   uint64_t time = tVMS / 10000 + julianOffset * millisPerDay;
 
-  int y, m, d;
+  // Extract the number of days since the Julian epoch
   int julianDay = static_cast<int>(time / millisPerDay);
   time -= millisPerDay * julianDay;
 
-  // Gregorian calendar starting from October 15, 1582
-  // This algorithm is from Henry F. Fliegel and Thomas C. Van Flandern
-  int ell, n, i, j;
-  ell = julianDay + 68569;
-  n = (4 * ell) / 146097;
-  ell = ell - (146097 * n + 3) / 4;
-  i = (4000 * (ell + 1)) / 1461001;
-  ell = ell - (1461 * i) / 4 + 31;
-  j = (80 * ell) / 2447;
-  d = ell - (2447 * j) / 80;
-  ell = j / 11;
-  m = j + 2 - (12 * ell);
-  y = 100 * (n - 49) + i + ell;
+  GregorianDateFromJulian(julianDay, year, month, day);
 
-  // Return the result
-  year = y;
-  month = m;
-  day = d;
+  // Convert the remaining time into hours, minutes, seconds, and milliseconds
   hour = static_cast<int>(time / millisPerHour);
   time -= hour * millisPerHour;
   minute = static_cast<int>(time / millisPerMinute);
@@ -208,7 +217,7 @@ ScancoImageIO::DecodeDate(const void * data,
 
 
 void
-ScancoImageIO::EncodeDate(void * target)
+ScancoImageIO::EncodeCurrentDate(void * target)
 {
   time_t currentTimeUnix;
   std::time(&currentTimeUnix);
@@ -216,6 +225,85 @@ ScancoImageIO::EncodeDate(void * target)
 
   const int d1 = (int)currentTimeVMS;
   const int d2 = (int)(currentTimeVMS >> 32);
+  ScancoImageIO::EncodeInt(d1, target);
+  ScancoImageIO::EncodeInt(d2, static_cast<char *>(target) + 4);
+}
+
+/** This algorithm is from Henry F. Fliegel and Thomas C. Van Flandern
+ * It converts a Gregorian date to a Julian day number.
+ * 
+ * \param year The year in the Gregorian calendar
+ * \param month The month in the Gregorian calendar
+ * \param day The day in the Gregorian calendar 
+ */
+int 
+julianDayFromDate(int year, int month, int day)
+{
+  // If month is January or February, treat them as months 13 and 14 of the previous year
+  if (month <= 2) {
+      year -= 1;
+      month += 12;
+  }
+  int a = year / 100;
+  int b = 2 - a + (a / 4);
+  int julianDay = static_cast<int>(365.25 * (year + 4716))
+                + static_cast<int>(30.6001 * (month + 1))
+                + day + b - 1524.5;
+  return julianDay;
+}
+
+void
+ScancoImageIO::EncodeDateFromString(void * target, const char dateString[32])
+{
+  int year, day, hour, minute, second, millis = 0;
+  char monthStr[4];
+  if (std::sscanf(dateString, "%d-%3s-%d %d:%d:%d.%d", &day, monthStr, &year, &hour, &minute, &second, &millis) != 7)
+  {
+    itkExceptionMacro("Invalid date string format. Expected format: YYYY-MMM-DD HH:MM:SS.MSS");
+  }
+
+  int month = 0;
+  std::map<std::string, int> months
+  {
+    { "XXX", 0 },
+    { "JAN", 1 },
+    { "FEB", 2 },
+    { "MAR", 3 },
+    { "APR", 4 },
+    { "MAY", 5 },
+    { "JUN", 6 },
+    { "JUL", 7 },
+    { "AUG", 8 },
+    { "SEP", 9 },
+    { "OCT", 10 },
+    { "NOV", 11 },
+    { "DEC", 12 }
+  };
+
+  const auto iter = months.find(monthStr);
+
+  if(iter != months.cend()) {
+    month = iter->second;
+  } 
+  else 
+  {
+    itkExceptionMacro("Unrecognized month in date string: " << *dateString);
+  }
+
+  // add time values to single time total in ms
+  uint64_t timestamp =  hour * millisPerHour + 
+                        minute * millisPerMinute +
+                        second * millisPerSecond + 
+                        millis;
+
+  // Calculate the Julian day from the date
+  int julianDay = julianDayFromDate(year, month, day);
+
+  uint64_t time = static_cast<uint64_t>(julianDay * millisPerDay) + timestamp;
+  uint64_t tVMS = (time - julianOffset * millisPerDay) * 10000; // Convert to VMS format
+
+  int d1 = static_cast<int>(tVMS);
+  int d2 = static_cast<int>(tVMS >> 32);
   ScancoImageIO::EncodeInt(d1, target);
   ScancoImageIO::EncodeInt(d2, static_cast<char *>(target) + 4);
 }
@@ -1400,7 +1488,7 @@ ScancoImageIO::WriteISQHeader(std::ofstream * file)
   header += 4;
   ScancoImageIO::EncodeInt(this->m_ScannerID, header);
   header += 4;
-  ScancoImageIO::EncodeDate(header);
+  ScancoImageIO::EncodeDateFromString(header, this->m_CreationDate);
   header += 8;
   for (unsigned int dimension = 0; dimension < 3; ++dimension)
   {

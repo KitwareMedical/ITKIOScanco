@@ -85,9 +85,10 @@ public:
 
   /** The different types of ImageIO's can support data of varying
    * dimensionality. For example, some file formats are strictly 2D
-   * while others can support 2D, 3D, or even n-D. This method returns
-   * true/false as to whether the ImageIO can support the dimension
-   * indicated. */
+   * while others can support 2D, 3D, or even n-D.
+   * \param dimension The dimension to check for support.
+   * \return True if the dimension is supported by ScancoIO, false otherwise.
+   */
   bool
   SupportsDimension(unsigned long dimension) override
   {
@@ -344,9 +345,18 @@ private:
              int &        minute,
              int &        second,
              int &        millis);
-  //! Convert the current calendar date to a VMS timestamp and store in target
+
+  /** Convert the current calendar date to a VMS timestamp and store in target */
   void
-  EncodeDate(void * target);
+  EncodeCurrentDate(void * target);
+
+  /** Convert a calendar date to VMS timestamp
+   *
+   * \param target Pointer to a buffer of at least 8 bytes.
+   * \param dateString  A string in the format "YYYY-MM-DD HH:MM:SS.mmm"
+  */
+  void
+  EncodeDateFromString(void * target, const char dateString[32]);
 
   //! Strip a string by removing trailing whitespace.
   /*!
