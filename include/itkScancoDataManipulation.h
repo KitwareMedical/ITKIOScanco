@@ -15,8 +15,8 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-#ifndef itkDataManipulation_h
-#define itkDataManipulation_h
+#ifndef itkScancoDataManipulation_h
+#define itkScancoDataManipulation_h
 #include <cstddef>
 
 /** Check the file header to see what type of file it is.
@@ -116,4 +116,4 @@ StripString(char * dest, const char * source, size_t length);
 void
 PadString(char * dest, const char * source, size_t length);
 
-#endif // itkDataManipulation_h
+#endif // itkScancoDataManipulation_h

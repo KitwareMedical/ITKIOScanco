@@ -37,7 +37,7 @@
 #include "itkIntTypes.h"
 #include "itkByteSwapper.h"
 #include "itkMetaDataObject.h"
-#include "itkDataManipulation.h"
+#include "itkScancoDataManipulation.h"
 
 #include <algorithm>
 #include <ctime>
