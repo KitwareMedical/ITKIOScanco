@@ -20,12 +20,15 @@
 #include <cstdint>
 #include <ctime>
 #include <map>
+#include <cstdio>    // for sscanf
+#include <stdexcept> // for std::runtime_error
+#include <string>    // for std::string
 
 /** VMS time conversion constants */
 /** This is the offset between the astronomical "Julian day", which counts
-* days since January 1, 4713BC, and the "VMS epoch", which counts from
-* November 17, 1858:
-*/
+ * days since January 1, 4713BC, and the "VMS epoch", which counts from
+ * November 17, 1858:
+ */
 constexpr uint64_t julianOffset = 2400001;
 constexpr uint64_t millisPerSecond = 1000;
 constexpr uint64_t millisPerMinute = 60 * 1000;
@@ -117,7 +120,8 @@ DecodeDouble(const void * data)
  * \param day The extracted Gregorian day
  */
 void
-GregorianDateFromJulian(int julianDay, int & year, int & month, int & day) {
+GregorianDateFromJulian(int julianDay, int & year, int & month, int & day)
+{
   int ell, n, i, j = 0;
   ell = julianDay + 68569;
   n = (4 * ell) / 146097;
@@ -132,14 +136,7 @@ GregorianDateFromJulian(int julianDay, int & year, int & month, int & day) {
 }
 
 void
-DecodeDate(const void * data,
-                          int &        year,
-                          int &        month,
-                          int &        day,
-                          int &        hour,
-                          int &        minute,
-                          int &        second,
-                          int &        millis)
+DecodeDate(const void * data, int & year, int & month, int & day, int & hour, int & minute, int & second, int & millis)
 {
   // Read the date as a long integer with units of 1e-7 seconds
   int      d1 = DecodeInt(data);
@@ -167,10 +164,11 @@ void
 EncodeCurrentDate(void * target)
 {
   uint64_t unixToVMSOffset = 3506695200; // VMS epoch starts at November 17, 1858
-  time_t currentTimeUnix;
+  time_t   currentTimeUnix;
   std::time(&currentTimeUnix);
   // unix epoch: January 1, 1970
-  const uint64_t currentTimeVMS = (currentTimeUnix  + unixToVMSOffset) * 10000000; // Convert to VMS format (1e-7 seconds)
+  const uint64_t currentTimeVMS =
+    (currentTimeUnix + unixToVMSOffset) + 10000000; // Convert to VMS format (1e-7 seconds)
 
   const int d1 = (int)currentTimeVMS;
   const int d2 = (int)(currentTimeVMS >> 32);
@@ -180,70 +178,54 @@ EncodeCurrentDate(void * target)
 
 /** This algorithm is from Henry F. Fliegel and Thomas C. Van Flandern
  * It converts a Gregorian date to a Julian day number.
- * 
+ *
  * \param year The year in the Gregorian calendar
  * \param month The month in the Gregorian calendar
- * \param day The day in the Gregorian calendar 
+ * \param day The day in the Gregorian calendar
  */
-int 
+int
 julianDayFromDate(int year, int month, int day)
 {
   // If month is January or February, treat them as months 13 and 14 of the previous year
-  if (month <= 2) {
-      year -= 1;
-      month += 12;
+  if (month <= 2)
+  {
+    year -= 1;
+    month += 12;
   }
   int a = year / 100;
   int b = 2 - a + (a / 4);
-  int julianDay = static_cast<int>(365.25 * (year + 4716))
-                + static_cast<int>(30.6001 * (month + 1))
-                + day + b - 1524.5;
+  int julianDay = static_cast<int>(365.25 * (year + 4716)) + static_cast<int>(30.6001 * (month + 1)) + day + b - 1524.5;
   return julianDay;
 }
 
 void
 EncodeDateFromString(void * target, const char dateString[32])
 {
-  int year, day, hour, minute, second, millis = 0;
+  int  year, day, hour, minute, second, millis = 0;
   char monthStr[4];
-  if (std::sscanf(dateString, "%d-%3s-%d %d:%d:%d.%d", &day, monthStr, &year, &hour, &minute, &second, &millis) != 7)
+  if (sscanf(dateString, "%d-%3s-%d %d:%d:%d.%d", &day, monthStr, &year, &hour, &minute, &second, &millis) != 7)
   {
-   std::runtime_error("Invalid date string format. Expected format: YYYY-MMM-DD HH:MM:SS.mmm");
+    throw std::runtime_error("Invalid date string format. Expected format: YYYY-MMM-DD HH:MM:SS.mmm");
   }
 
-  int month = 0;
-  std::map<std::string, int> months
-  {
-    { "XXX", 0 },
-    { "JAN", 1 },
-    { "FEB", 2 },
-    { "MAR", 3 },
-    { "APR", 4 },
-    { "MAY", 5 },
-    { "JUN", 6 },
-    { "JUL", 7 },
-    { "AUG", 8 },
-    { "SEP", 9 },
-    { "OCT", 10 },
-    { "NOV", 11 },
-    { "DEC", 12 }
-  };
+  int                        month = 0;
+  std::map<std::string, int> months{ { "XXX", 0 },  { "JAN", 1 },  { "FEB", 2 }, { "MAR", 3 }, { "APR", 4 },
+                                     { "MAY", 5 },  { "JUN", 6 },  { "JUL", 7 }, { "AUG", 8 }, { "SEP", 9 },
+                                     { "OCT", 10 }, { "NOV", 11 }, { "DEC", 12 } };
 
   const auto iter = months.find(monthStr);
 
-  if(iter != months.cend()) {
-    month = iter->second;
-  } 
-  else 
+  if (iter != months.cend())
   {
-    month = 0;  
+    month = iter->second;
+  }
+  else
+  {
+    month = 0;
   }
 
   // add time values to single time total in ms
-  uint64_t timestamp =  hour * millisPerHour + 
-                        minute * millisPerMinute +
-                        second * millisPerSecond + 
-                        millis;
+  uint64_t timestamp = hour * millisPerHour + minute * millisPerMinute + second * millisPerSecond + millis;
 
   // Calculate the Julian day from the date
   int julianDay = julianDayFromDate(year, month, day);

@@ -317,11 +317,6 @@ private:
   void
   RescaleToHU(TBufferType * buffer, size_t size);
 
-  /** Rescale the image data to Hounsfield Units */
-  template <typename TBufferType>
-  void
-  RescaleToHU(TBufferType * buffer, size_t size);
-
   void
   InitializeHeader();
 

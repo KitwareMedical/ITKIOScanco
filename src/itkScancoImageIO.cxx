@@ -282,24 +282,26 @@ ScancoImageIO::ReadISQHeader(std::ifstream * file, unsigned long bytesRead)
   month = ((month > 12 || month < 1) ? 0 : month);
   static const char * months[] = { "XXX", "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
                                    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
-  sprintf(this->m_CreationDate,
-          "%d-%s-%d %02d:%02d:%02d.%03d",
-          (day % 100),
-          months[month],
-          (year % 10000),
-          (hour % 100),
-          (minute % 100),
-          (second % 100),
-          (milli % 1000));
-  sprintf(this->m_ModificationDate,
-          "%d-%s-%d %02d:%02d:%02d.%03d",
-          (day % 100),
-          months[month],
-          (year % 10000),
-          (hour % 100),
-          (minute % 100),
-          (second % 100),
-          (milli % 1000));
+  snprintf(this->m_CreationDate,
+           32,
+           "%d-%s-%d %02d:%02d:%02d.%03d",
+           (day % 100),
+           months[month],
+           (year % 10000),
+           (hour % 100),
+           (minute % 100),
+           (second % 100),
+           (milli % 1000));
+  snprintf(this->m_ModificationDate,
+           32,
+           "%d-%s-%d %02d:%02d:%02d.%03d",
+           (day % 100),
+           months[month],
+           (year % 10000),
+           (hour % 100),
+           (minute % 100),
+           (second % 100),
+           (milli % 1000));
 
   // Perform a sanity check on the dimensions
   for (int i = 0; i < 3; ++i)
@@ -821,7 +823,6 @@ ScancoImageIO::ReadImageInformation()
   }
 
   infile.close();
- 
   this->PopulateMetaDataDictionary();
 }
 
@@ -891,14 +892,11 @@ ScancoImageIO::SetHeaderFromMetaDataDictionary()
   ExposeMetaData<double>(metaData, "SliceThickness", this->m_SliceThickness);
   ExposeMetaData<double>(metaData, "SliceIncrement", this->m_SliceIncrement);
 
-  std::vector<double> dataRange(2);
-  if (ExposeMetaData<std::vector<double>>(metaData, "DataRange", dataRange))
+  std::vector<double> dataRange;
+  if (ExposeMetaData<std::vector<double>>(metaData, "DataRange", dataRange) && dataRange.size() >= 2)
   {
-    if (dataRange.size() >= 2)
-    {
-      this->m_DataRange[0] = dataRange[0];
-      this->m_DataRange[1] = dataRange[1];
-    }
+    this->m_DataRange[0] = dataRange[0];
+    this->m_DataRange[1] = dataRange[1];
   }
 
   ExposeMetaData<double>(metaData, "MuScaling", this->m_MuScaling);
@@ -937,7 +935,7 @@ ScancoImageIO::RescaleToHU(TBufferType * buffer, size_t size)
   double slope = this->m_RescaleSlope;
   double intercept = this->m_RescaleIntercept;
 
-   // This code causes rescaling to Hounsfield units
+  // This code causes rescaling to Hounsfield units
   if (this->m_MuScaling > 1.0 && this->m_MuWater > 0)
   {
     // mu(voxel) = intensity(voxel) / m_MuScaling
@@ -1135,8 +1133,7 @@ ScancoImageIO::Read(void * buffer)
         RescaleToHU(reinterpret_cast<char *>(buffer), bufferSize);
         break;
       case IOComponentEnum::UCHAR:
-        RescaleToHU(
-          reinterpret_cast<unsigned char *>(buffer), bufferSize);
+        RescaleToHU(reinterpret_cast<unsigned char *>(buffer), bufferSize);
         break;
       case IOComponentEnum::SHORT:
         bufferSize /= 2;
@@ -1144,8 +1141,7 @@ ScancoImageIO::Read(void * buffer)
         break;
       case IOComponentEnum::USHORT:
         bufferSize /= 2;
-        RescaleToHU(
-          reinterpret_cast<unsigned short *>(buffer), bufferSize);
+        RescaleToHU(reinterpret_cast<unsigned short *>(buffer), bufferSize);
         break;
       case IOComponentEnum::INT:
         bufferSize /= 4;
@@ -1153,8 +1149,7 @@ ScancoImageIO::Read(void * buffer)
         break;
       case IOComponentEnum::UINT:
         bufferSize /= 4;
-        RescaleToHU(
-          reinterpret_cast<unsigned int *>(buffer), bufferSize);
+        RescaleToHU(reinterpret_cast<unsigned int *>(buffer), bufferSize);
         break;
       case IOComponentEnum::FLOAT:
         bufferSize /= 4;
@@ -1272,7 +1267,6 @@ ScancoImageIO::WriteISQHeader(std::ofstream * file)
   const std::size_t fillSize = 83 * 4;
   std::memset(header, 0x00, fillSize);
   header += fillSize;
-  // dataOffset todo @erica, no offset?
   const int dataOffset = 0;
   EncodeInt(dataOffset, header);
   header += 4;
