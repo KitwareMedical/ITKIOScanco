@@ -21,7 +21,7 @@
   ],
   "author": "Matt McCormick <matt.mccormick@kitware.com>",
   "license": "Apache-2.0",
-  "homepage": "https://github.com/KitwareMedical/ITKIOScanco#readme",
+  "homepage": "https://github.com/InsightSoftwareConsortium/ITKIOScanco#readme",
   "dependencies": {
     "@itk-wasm/image-io": "^0.3.0",
     "itk-wasm": "1.0.0-b.149"
@@ -31,11 +31,11 @@
     "@shoelace-style/shoelace": "^2.5.2",
     "@types/node": "^20.2.5",
     "shx": "^0.3.4",
-    "vite": "^4.3.9",
+    "vite": "^4.5.14",
     "vite-plugin-static-copy": "^0.14.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/KitwareMedical/ITKIOScanco"
+    "url": "https://github.com/InsightSoftwareConsortium/ITKIOScanco"
   }
 }
