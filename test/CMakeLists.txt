@@ -73,3 +73,10 @@ itk_add_test(NAME itkScancoImageIOAIMHeaderCheckTest2
   )
 set_property(TEST itkScancoImageIOAIMHeaderCheckTest2 APPEND PROPERTY DEPENDS
   itkScancoImageIOAIMHeaderCheckTest)
+
+itk_add_test(NAME itkScancoImageIOISQReadWritten
+  COMMAND IOScancoTestDriver
+    itkScancoImageIOTest2
+      ${ITK_TEST_OUTPUT_DIR}/C0004255Test2.isq
+      ${ITK_TEST_OUTPUT_DIR}/ISQWrite.ISQ
+)
