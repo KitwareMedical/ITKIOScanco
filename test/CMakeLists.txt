@@ -115,3 +115,23 @@ itk_add_test(NAME itkScancoImageIOAIM030FloatReadHeader
       0
       "AIMDATA_V030   "
 )
+
+itk_add_test(NAME itkScancoImageIOAIMReadBin
+  COMMAND IOScancoTestDriver
+  --compare
+      DATA{Baseline/AIMIOTestImage.mha}
+      ${ITK_TEST_OUTPUT_DIR}/AIMIOBinUncompressed.aim
+    itkScancoImageIOTest3
+      DATA{Input/AIMIOTestImageBin.AIM}
+      ${ITK_TEST_OUTPUT_DIR}/AIMIOBinUncompressed.aim
+)
+
+itk_add_test(NAME itkScancoImageIOAIMReadRun
+  COMMAND IOScancoTestDriver
+  --compare
+      DATA{Baseline/AIMIOTestImage.mha}
+      ${ITK_TEST_OUTPUT_DIR}/AIMIORunUncompressed.aim
+    itkScancoImageIOTest3
+      DATA{Input/AIMIOTestImageRun.AIM}
+      ${ITK_TEST_OUTPUT_DIR}/AIMIORunUncompressed.aim
+)
