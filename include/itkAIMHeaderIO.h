@@ -55,14 +55,13 @@ public:
 protected:
   /** Read the AIM pre-header from the file stream.
    * \param file The input file stream to read the header from.
-   * \param length The length of the pre-header to read.
    * \param offset The offset in the file to start reading from.
    * \note m_IntSize is used to determine the size of integers in the pre-header,
    *      and should be set appropriately before calling
    * \returns -1 on failure, 0 on success.
    */
   int
-  ReadPreHeader(std::ifstream & file, unsigned long length, unsigned long offset = 0);
+  ReadPreHeader(std::ifstream & file, unsigned long offset = 0);
 
   /** Read the AIM v020 image structure header from a data structure.
    * \param headerData pointer to structure containing image structure header
@@ -120,9 +119,9 @@ private:
   unsigned int m_IntSize{ 4 }; // Size of integers in the header (4 for AIM v020, 8 for AIM v030)
 
   /** Header Size = m_PreHeaderSize + m_ImgStructSize + m_ProcessingLogSize */
-  unsigned long m_PreHeaderSize{ 0 };
-  unsigned long m_ImgStructSize{ 0 };
-  unsigned long m_ProcessingLogSize{ 0 };
+  size_t m_PreHeaderSize{ 0 };
+  size_t m_ImgStructSize{ 0 };
+  size_t m_ProcessingLogSize{ 0 };
 };
 } // namespace itk
 #endif // itkAIMHeaderIO_h
