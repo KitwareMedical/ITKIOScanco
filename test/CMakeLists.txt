@@ -81,7 +81,9 @@ itk_add_test(NAME itkScancoImageIOISQReadWritten
       ${ITK_TEST_OUTPUT_DIR}/C0004255Test2.isq
       ${ITK_TEST_OUTPUT_DIR}/ISQWrite.ISQ
 )
-
+set_property(TEST itkScancoImageIOISQReadWritten APPEND PROPERTY DEPENDS 
+  itkScancoImageIOISQHeaderWriteTest2)
+  
 itk_add_test(NAME itkScancoImageIOAIMWriteTest
   COMMAND IOScancoTestDriver
   --compare
